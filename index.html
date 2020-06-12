@@ -1,0 +1,7 @@
+<script>
+    if(localStorage.getItem("lang") === null)
+    {
+        localStorage.setItem("lang", "fr");
+    }
+    location.href = localStorage.getItem("lang")+"/home.html";
+</script>

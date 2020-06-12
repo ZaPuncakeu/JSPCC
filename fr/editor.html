@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../css/themes.js"></script>
+    <script src="parser.js"></script>
+    <script src="editor.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../fonts/consolas.css">
+    <link rel="stylesheet" href="../css/algo.css">
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>AlgoJS</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="left-nav">
+            <a>
+                <h1 class="logo">JSPCC</h1>
+            </a>
+        </div>
+
+        <div class="mobile burger" >
+            <button class="bars-mobile">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="right-nav">
+            <div class="element-container">
+                <a href="home.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-home"></i> &nbsp; Accueil
+                    </button>
+                </a>
+
+                <a>
+                    <button class="nav-elem">
+                        <i class="fa fa-code"></i> &nbsp; Editeur de code
+                    </button>
+                </a>
+
+                <!--<a href="#">
+                    <button class="nav-elem">
+                        <i class="fa fa-file-code-o"></i> &nbsp; Documentation
+                    </button>
+                </a>-->
+
+                <!--<a href="#">
+                    <button class="nav-elem">
+                        <i class="fa fa-bell"></i> &nbsp; Notifications
+                    </button>
+                </a>-->
+            </div>
+        </div>
+    </nav>
+
+    <div class="mobile btns-tools">
+        <button class="parsebtn-mobile" onclick="Parse()">
+            Compiler  
+            <br>
+            <i class="fa fa-cog"></i>
+        </button>
+        <button class="execbtn-mobile" onclick="exec()">
+            Exécuter
+            <br>
+            <i class="fa fa-play"></i>
+        </button>
+    </div>
+
+    <div class="codearea code-font">
+        <div class="line_num">
+            1
+        </div>
+
+        <div class="editor">
+            <div class="snippet">
+                <div class="code">
+
+                </div>
+                <textarea id="txtcode" spellcheck="false" class="codesnippet code-font" placeholder="Code...">
+                    
+                </textarea>
+            </div>
+        </div>
+        <div class="tools-pc">
+            <button class="parsebtn" onclick="Parse()">
+                Compiler
+                <br>
+                <i class="fa fa-cog"></i>
+            </button>
+            <br><br>
+            <button class="execbtn" onclick="exec()">
+                Exécuter
+                <br>
+                <i class="fa fa-play"></i>
+            </button>
+            <br><br>
+            <button class="uploadbtn">
+                <div>
+                    Importer
+                    <br>
+                    <i class="fa fa-upload"></i>
+                </div>
+                <input type="file" class="uplbtn" style="cursor: pointer; z-index: 90; position: relative; width: 70px; height: 50px; opacity: 0;">
+            </button>
+        </div>
+    </div>
+    
+    <div class="consoles" id="build">
+        <div class="modal-body">
+            <div class="quit"><button onclick="closeConsoles()"><i class="fa fa-close"></i></button></div>
+            <div class="log">
+            </div>
+        </div>
+    </div>
+
+    <div class="consoles" id="exec">
+        <div class="modal-body">
+            <div class="quit"><button onclick="closeConsoles()"><i class="fa fa-close"></i></button></div>
+            <div class="log">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    $(document).ready(function()
+    {
+        $(".codesnippet").empty();
+    });
+</script>

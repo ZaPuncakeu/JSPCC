@@ -1,0 +1,189 @@
+
+
+.navbar 
+{
+    width: 100%;
+    height: 60px;
+    background-color: rgb(41, 43, 54);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.logo
+{
+    color: white;
+    padding-left: 15px;
+    font-size: 2em;
+    cursor: pointer;
+}
+
+.nav-elem 
+{
+    height: 100%;
+    border: none;
+    background-color: rgb(56, 59, 75);
+    color: white;
+    padding: 15px;
+    font-size: 1em;
+    margin-right: 5px;
+    outline: none;
+    cursor: pointer;
+}
+
+.nav-elem:hover 
+{
+    background-color: rgb(50, 153, 50);
+}
+
+.part1
+{
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap-reverse;
+}
+
+.sub-part1
+{
+    margin-top: 50px;
+    width: 40%;
+    text-align: left;
+    color: white;
+}
+
+.sub-part1 h1 
+{
+    font-size: 2.2em;
+    margin: 0;
+    padding: 0;
+}
+
+.sub-part1 button 
+{
+    border: solid white 2px;
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    outline: none;
+} 
+
+.sub-part1 button:hover 
+{
+    background-color: rgb(50, 153, 50);
+    border-color: rgb(50, 153, 50);
+} 
+
+.sub-part1 .tuto:hover 
+{
+    background-color: rgb(197, 135, 19);
+    border-color: rgb(197, 135, 19);
+} 
+
+.sub-part1 span 
+{
+    font-family: 'Roboto';
+    font-size: 1em;
+}
+
+.sub-part2
+{
+    width: 50%;
+}
+
+.sub-part2 img 
+{
+    width: 100%;
+    margin-top: 55px;
+    border-radius: 20px;
+    box-shadow: 1px 1px 20px -5px;
+}
+
+.main-title 
+{
+    text-align: center;
+    font-size: 2.5em;
+    color: white;
+}
+
+.element-container
+{
+    height: 100%;
+    margin-right: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.colored-letter 
+{
+    color: rgb(50, 153, 50);
+}
+
+.mobile 
+{
+    display: none;
+}
+
+@media only screen and (max-width: 1024px)
+{
+    .bars-mobile 
+    {
+        height: 100%;
+        border: none;
+        background-color: rgb(56, 59, 75);
+        color: white;
+        padding: 15px;
+        font-size: 1em;
+        outline: none;
+        cursor: pointer;
+        width: 55px;
+    }
+
+    .main-title
+    {
+        margin: auto;
+        width: 70%;
+    }
+
+    .mobile
+    {
+        display: block;
+    }
+
+    .right-nav
+    {
+        width: 100%;
+        z-index: 99;
+        margin: 0;
+        overflow: hidden;
+        height: 180px;
+        display: none;
+    }
+
+    .nav-elem
+    {
+        width: 100%;
+        text-align: left;
+        position: relative;
+    }
+
+    .right-nav a 
+    {
+        z-index: 99;
+        width: 100%;
+    }
+
+    .sub-part1
+    {
+        text-align: center;
+        width: 80%;
+        margin-bottom: 50px;
+    } 
+
+    .sub-part2
+    {
+        width: 80%;
+    }
+}

@@ -267,7 +267,7 @@ body
         height: 80vh;
     }
 
-    .parsebtn-mobile,.execbtn-mobile
+    .parsebtn-mobile,.execbtn-mobile, .uploadbtn-mobile
     {
         width: 70px;
         height: 50px;
@@ -278,6 +278,13 @@ body
         user-select: none;
         outline: none;
         cursor: pointer;
+    }
+
+    .uploadbtn-mobile 
+    {
+        padding-top: 8px;
+        position: relative;
+        top: 2.5px;
     }
 
     .btns-tools
@@ -298,6 +305,25 @@ body
         background-color: rgb(206, 137, 33);
         border-color: rgb(206, 137, 33);
         cursor: pointer; 
+    }
+
+    .uploadbtn-mobile > *
+    {
+        position: absolute;
+        width: 70px;
+        height: 50px;
+        top: 0;
+        left: 0;
+    }
+
+    .uploadbtn-mobile > div
+    {
+        position: absolute;
+        width: 70px;
+        height: 50px;
+        top: 8px;
+        left: 0;
+        cursor: pointer;
     }
 
     .line_num

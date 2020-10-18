@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="../css/algo.css">
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>AlgoJS</title>
+    <title>Editeur de code | JSPCC</title>
 </head>
 <body>
     <nav class="navbar">
@@ -22,7 +22,7 @@
                 <h1 class="logo">JSPCC</h1>
             </a>
         </div>
-
+        
         <div class="mobile burger" >
             <button class="bars-mobile">
                 <i class="fa fa-bars"></i>
@@ -43,11 +43,11 @@
                     </button>
                 </a>
 
-                <!--<a href="#">
+                <a href="docs/introduction.html">
                     <button class="nav-elem">
                         <i class="fa fa-file-code-o"></i> &nbsp; Documentation
                     </button>
-                </a>-->
+                </a>
 
                 <!--<a href="#">
                     <button class="nav-elem">
@@ -58,6 +58,8 @@
         </div>
     </nav>
 
+    <div class="separator"></div>
+    
     <div class="mobile btns-tools">
         <button class="parsebtn-mobile" onclick="Parse()">
             Compiler  
@@ -76,6 +78,11 @@
                 <i class="fa fa-upload"></i>
             </div>
             <input type="file" class="uplbtn" style="cursor: pointer; z-index: 100; position: relative; width: 70px; height: 50px; opacity: 0;">
+        </button>
+        <button class="downloadbtn-mobile" onclick="downloadFile()">
+            Télécharger
+            <br>
+            <i class="fa fa-download"></i>
         </button>
     </div>
 
@@ -114,6 +121,12 @@
                     <i class="fa fa-upload"></i>
                 </div>
                 <input type="file" class="uplbtn" style="cursor: pointer; z-index: 90; position: relative; width: 70px; height: 50px; opacity: 0;">
+            </button>
+            <br><br>
+            <button class="downloadbtn" onclick="downloadFile()">
+                Télécharger
+                <br>
+                <i class="fa fa-download"></i>
             </button>
         </div>
     </div>

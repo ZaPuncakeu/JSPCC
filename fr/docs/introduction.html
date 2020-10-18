@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../../css/themes.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../fonts/consolas.css">
+    <link rel="stylesheet" href="../../css/docs.css">
+    <link rel="stylesheet" href="../../css/algo.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Introduction | Documentation | JSPCC</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="left-nav">
+            <div class="mobile" style="height: 100%;">
+                <button class="menu-btn">
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile burger" >
+            <button class="bars-mobile">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="right-nav">
+            <div class="element-container">
+                <a href="../home.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-home"></i> &nbsp; Accueil
+                    </button>
+                </a>
+
+                <a href="../editor.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-code"></i> &nbsp; Editeur de code
+                    </button>
+                </a>
+
+                <a>
+                    <button class="nav-elem">
+                        <i class="fa fa-file-code-o"></i> &nbsp; Documentation
+                    </button>
+                </a>
+
+                <!--<a href="#">
+                    <button class="nav-elem">
+                        <i class="fa fa-bell"></i> &nbsp; Notifications
+                    </button>
+                </a>-->
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-menu">
+        <div class="separator"></div>
+        <h1 style="text-align: center; color: aliceblue;">Documentation</h1>
+        <div class="menu-body">
+            <h2>Générale</h2>
+            <a>
+                <button class="doc-elem selected-elem">
+                    Introduction
+                </button>
+            </a>
+            <a href="motcle.html">
+                <button class="doc-elem">
+                    Mots clés
+                </button>
+            </a>
+            <h2>Bases</h2>
+            <a href="structure-dun-algorithme.html">
+                <button class="doc-elem">
+                    Structure d'un Algorithme
+                </button>
+            </a>
+            <a href="declarations.html">
+                <button class="doc-elem">
+                    Déclarations
+                </button>
+            </a>
+            <a href="lecture-ecriture.html">
+                <button class="doc-elem">
+                    Lecture / Ecriture 
+                </button>
+            </a>
+            <a href="conditions.html">
+                <button class="doc-elem">
+                    Conditions 
+                </button>
+            </a>
+            <a href="boucles.html">
+                <button class="doc-elem">
+                    Boucles 
+                </button>
+            </a>
+            <h2>Structures de données</h2>
+            <a href="tableaux.html">
+                <button class="doc-elem">
+                    Tableaux 
+                </button>
+            </a>
+        </div>
+
+        <script>
+            $(document).ready(function()
+            {
+                let on = false;
+                let resized = false;
+
+                $(".menu-btn").on("click", function()
+                {
+                    if(on)
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-left");
+                        $(".menu-btn i").addClass("fa-arrow-right");
+                        $(".doc-menu").animate(
+                        {
+                            left: "-100%"
+                        });
+                        on = false;
+                    }
+                    else 
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-right");
+                        $(".menu-btn i").addClass("fa-arrow-left");
+                        $(".doc-menu").animate(
+                        {
+                            left: "0"
+                        });
+                        on = true;
+                    }
+                })
+
+                $(window).resize(function()
+                {
+                    if($(window).width() > 1024)
+                    {
+                        resized = true;
+                        $(".doc-menu").css("left", "0");
+                        on = false;
+                    }
+                    
+                    if($(window).width() <= 1024 && resized)
+                    {
+                        resized = false;
+                        $(".doc-menu").css("left", "-100%");
+                        on = false;
+                    }
+                    
+                });
+            });
+        </script>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div class="doc-body">
+        <div class="body-content">
+            <h1 class="section-title" style="font-size: 2.5em;">Introduction</h1>
+            <div class="section-content">
+                <h3 class="section-title section-subtitle">Contenu de la section:</h3>
+                <ul class="content"> 
+                    <li><a href="#def">Définition d'un Algorithme</a></li>
+                    <li><a href="#pva">Programmation VS Algorithme</a></li>
+                    <li><a href="#pc">Qu'est ce que le Pseudo-code ?</a></li>
+                    <li><a href="#jpc">Qu'est ce que JSPCC ?</a></li>
+                </ul>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="def">
+                <h3 class="section-title section-subtitle">Définition d'un Algorithme</h3>
+                <br>
+                <p class="sec-cont">
+                    Un algorithme est une façon de penser qui n'est pas propre à la programmation 
+                    ou à l'informatique en générale, mais les machines suivent le même principe.
+                    
+                    <br><br>
+                    
+                    Le principe est simple: un Algorithme
+                    est une suite finie d'<b style="color: rgb(74, 146, 95);">instructions</b>, qui 
+                    manipulent des <b style="color: rgb(211, 167, 74);">données</b> pour arriver à un résultat
+                    qui va résoudre un problème donné.
+                   
+                    <br><br>
+                    
+                    L'un des exemples les plus connus pour illustrer un algorithme est: 
+                    <b style="color: rgb(83, 168, 168);">Une recette de cuisine.</b>
+                    
+                    <br><br>
+                   
+                    Soit la <b style="color: rgb(83, 168, 168);">recette de gateau</b> suivante: 
+                    
+                    <br><br>
+                    
+                    <b style="color: rgb(211, 167, 74);">INGRÉDIENTS:</b>
+                    <br>
+                    - 6 c. à soupe de farine
+                    <br>
+                    - 6 c. à soupe de sucre en poudre
+                    <br>
+                    - 2 c. à soupe d'huile
+                    <br>
+                    - 4 c. à soupe de lait
+                    <br>
+                    - 2 œufs entiers
+                    <br>
+                    - 1 sachet de levure chimique
+                    <br>
+                    - 1 pincée de sel
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 1:</b>
+                    <br>
+                    Avant de débuter cette recette de gâteau simple, commencez 
+                    par en anticiper la cuisson. Pour cela, préchauffez le four à 180°C
+                    <br><br>
+                    <b style="color: rgb(74, 146, 95);">ETAPE 2:</b>
+                    <br>
+                    Avant de débuter cette recette de gâteau simple, commencez 
+                    par en anticiper la cuisson. Pour cela, préchauffez le four à 180°C
+                    
+                    <br><br>
+
+                    <b style="color: rgb(74, 146, 95);">ETAPE 2:</b>
+                    <br>
+                    Battez les œufs entiers avec le sucre en poudre dans un grand saladier 
+                    jusqu’à ce que le mélange blanchisse et soit bien homogène et lisse.
+                    
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 3:</b>
+                    <br>
+                    Ajoutez alors la farine, le sel et la levure chimique puis mélangez de 
+                    nouveau afin de bien intégrer ces nouveaux ingrédients à la préparation.
+                    
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 4:</b>
+                    <br>
+                    Délayez la préparation en versant progressivement le lait puis l’huile neutre, 
+                    en continuant de mélanger. Remuez jusqu'à obtenir une pâte bien lisse et homogène.
+                    
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 5:</b>
+                    <br>
+                    Beurrez un moule à manqué et versez-y la pâte. Vous pouvez également utiliser un moule 
+                    en silicone sans y ajouter de matière grasse.
+                    
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 6:</b>
+                    <br>
+                    Enfournez et faites cuire le gâteau simple pendant environ 15 minutes. Vérifiez la cuisson 
+                    du gâteau avec la pointe d’un couteau. Elle doit ressortir propre et sèche à la fin de la cuisson.
+                    
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 7:</b>
+                    <br>
+                    A la sortie du four, démoulez le gâteau sur un plat de service.
+
+                    <br><br>
+                    
+                    <b style="color: rgb(74, 146, 95);">ETAPE 8:</b>
+                    <br>
+                    Dégustez tiède, de préférence, nappé d’un peu de crème anglaise pour le dessert. Vous pouvez également 
+                    accompagner votre gâteau simple de quelques cuillerées de confiture ou de pâte à tartiner.
+
+                    <br><br><br>
+
+                    Et voilà une recette de gateau que vous pourrez tester et déguster ! 
+                    <br><br>
+                    Pour en revenir à l'Algorithmique, ici on peut voir que les <b style="color: rgb(211, 167, 74);">ingrédients</b>
+                    qui représentent les <b style="color: rgb(211, 167, 74);">données</b> sont utilisées (manipuliées) durant les 
+                    <b style="color: rgb(74, 146, 95);">étapes</b> qui représentent les 
+                    <b style="color: rgb(74, 146, 95);">instructions</b> de mon algorithme, lorsque'on arrive à la fin
+                    (car c'est une suite finie d'instructions) on se retrouve avec un résultat qui dans ce cas est notre
+                    beau gateau ! et par la même occasion, on résout un problème: satisfaire notre envie de sucrerie :p
+                    <br><br>
+                    C'est la même chose pour la machine, nous allons lui donner des étapes ainsi que les données
+                    qu'elle doit utiliser pour arriver à un résultat.
+                </p>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="pva">
+                <h3 class="section-title section-subtitle">Programmation VS Algorithme</h3>
+                <br>
+                <p class="sec-cont">
+                    Avent de voir comment créer un algorithme, je voudrais d'abord qu'on se mettent d'accord
+                    sur un point: 
+                    <br> 
+                    <b style="color: red;">Algorithme =/= Programmation</b>
+                    <br><br>
+                    La plus part des étudiants ne font pas la différence entre l'Algorithmique et la Programmation.
+                    <br><br>
+
+                    Programmer signifie écrire un programme, qui est une suite d'instructions qui manipulent données 
+                    pour arriver à un résultat qui résout un problème. Vous avez déjà entendu cette définition 
+                    quelque part ? Et oui ! un Programme est un Algorithme.
+
+                    <br><br>
+                    
+                    Ce qui veut dire aussi que l'on ne programme pas en Algorithmique, car l'Algorithme représente le 
+                    programme lui même. 
+                    
+                    Donc ce n'est pas un outil pour réaliser des programmes comme le pensent à tord la plus part 
+                    des étudians.
+                    
+                    <br><br>
+
+                    On utilise un Pseudo-code pour Schématiser les Algorithmes (Programmes).
+                </p>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="pc">
+                <h3 class="section-title section-subtitle">Qu'est ce que le Pseudo-code ?</h3>
+                <br>
+                <p class="sec-cont">
+                    Comme je l'ai dit en haut, le Pseudo-code est un "outil" pour faire des Algorithmes.
+                    
+                    <br><br>
+                    Bon c'est vrai, j'ai dit "Schématiser" et non pas "créer", mais il y'a une raison précise à
+                    cela ! Et bien c'est tout simplement parce-que le Pseudo-code est ce qu'on appelle un 
+                    <b style="color: rgb(83, 168, 168);">LDA</b> (<b style="color: rgb(83, 168, 168);">L</b>angage 
+                    de <b style="color: rgb(83, 168, 168);">D</b>escription d'<b style="color: rgb(83, 168, 168);">A</b>lgorithmes)
+                    <br>
+                    Il est donc utilisé comme dit ici, pour décrire les Algorithmes et non les créers. Donc, on ne peut pas créer de programme
+                    exécutable par la machine en utilisant le Pseudo-code.
+                    
+                    <br><br>
+
+                    On décrit un programme (Algorithme) avec le Pseudo-code, puis on le traduit vers un langage de programmation 
+                    qui lui, est exécutable par la machine (exemple: C, C++, Java, Python...etc).
+
+                    <br><br>
+                </p>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="jpc">
+                <h3 class="section-title section-subtitle">Qu'est ce que JSPCC ?</h3>
+                <br>
+                <p class="sec-cont">
+                    Comme je l'ai dit en haut, le Pseudo-code n'est pas exécutable par la machine, et généralement
+                    les étudians doivent passer vers un vrai langage pour vérifier si leur algorithme fonctionne
+                    ou non.
+
+                    <br><br>
+
+                    J'ai donc créé un environement d'exécution pour le Pseudo-code ! Comme ça, lors des révisions, les 
+                    étudiants pourront voir directement le résultat de leur algorithmes.
+                    
+                </p>
+            </div>
+
+        </div>
+
+        <br><br><br>
+    </div>
+</body>
+</html>

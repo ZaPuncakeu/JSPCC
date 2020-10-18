@@ -68,19 +68,66 @@ function Lex(code)
     let curr_char = 0;
     let curr_token = "";
     let inside_string = false;
+    let inline_com = false;
+    let multiline_com = false;
+
     while(curr_char < code.length)
     {
-        if(code[curr_char] == '"')
+        if(!multiline_com && !inline_com && code[curr_char] == '"')
         {
             inside_string = !inside_string;
         }
 
-        if(!AnalysisStoppers(code[curr_char]) || inside_string)
+        if(!multiline_com &&
+           !inline_com &&
+           !inside_string && 
+           code[curr_char] == "/" && 
+           curr_char+1 < code.length  && 
+           code[curr_char+1] == "/")
+        {
+            curr_token += "//";
+            curr_char += 2;
+            inline_com = true;
+            continue;
+        }
+
+        if(!multiline_com &&
+            !inline_com &&
+            !inside_string && 
+            code[curr_char] == "/" && 
+            curr_char+1 < code.length  && 
+            code[curr_char+1] == "*")
+        {
+            curr_token += "/*";
+            curr_char += 2;
+            multiline_com = true;
+            continue;
+        }
+
+        if( multiline_com &&
+            !inline_com &&
+            !inside_string && 
+            code[curr_char] == "*" && 
+            curr_char+1 < code.length  && 
+            code[curr_char+1] == "/")
+        {
+            curr_token += "*/";
+            curr_char += 2;
+            multiline_com = false;
+            curr_token = "";
+        }
+  
+
+        if(!AnalysisStoppers(code[curr_char]) || 
+                             inside_string || 
+                             (inline_com && !code[curr_char].match(/^\n$/)) || 
+                             multiline_com)
         {
             curr_token += code[curr_char];
         }
         else 
         {
+            inline_com = false;
             addToken(curr_token);
             curr_token = code[curr_char];
             addToken(curr_token);
@@ -1016,7 +1063,6 @@ function program_main()
             };
 
             current_function = token.value;
-
             token = getNextToken();
             if(!checkToken(";"))
             {
@@ -2320,7 +2366,7 @@ function write_message(prg)
         }
     }
 
-    return message;
+    return message.split(" ").join("&nbsp;");
 }
 
 function read_variable(prg, id, indexes)
@@ -2400,27 +2446,32 @@ function Parse()
 
     Reset();
     
+    let ParseTimeStart = getTime();
+
     Lex(code);
     
     program_root();
-    displayErrors();
+    displayErrors(getTime() - ParseTimeStart);
 }
 
 function exec()
 {
-    if(full_program.length > 0 && errorList.length == 0)
+    console.log(errorList.length);
+    if(errorList.length == 0)
     {
         $("#exec .log").empty();
         $("#exec").show();
+        let execStartTime = getTime(); 
         execute(full_program);
+        errorList = [];
+        let parseTime = getTime() - execStartTime;
+        //$("#exec .log").append("<div class='dec'><br><br>- Temps d'exécution: "+parseTime+"ms</div>");
     }
     else 
     {
-        alert("One of these problems occures:"+
-              "\n- You didn't type any code yet."+
-              "\n- You didn't build yet."+
-              "\n- Your code contains 1 or many errors."+
-              "\n\nPlease, make sure you have none of the problems above before being able to execute.");
+        alert("L'un de ces problèmes est survenu:"+
+              "\n- Vous n'avez pas encore complié"+
+              "\n- Vous avez une ou plusieurs erreurs");
     }
 }
 
@@ -2767,7 +2818,12 @@ function conflictingTypes(t1, t2)
     setError("Opération entre 2 types incompatibles ("+t1+", "+t2+"). Conversion implicite impossible.");
 }
 
-function displayErrors()
+function capacityOverflow()
+{
+    setError("Dépacement de capacité.");
+}
+
+function displayErrors(parseTime)
 {
     if(errorList.length > 0)
     {
@@ -2778,8 +2834,17 @@ function displayErrors()
                                   ", colonne "+ errorList[i].col + "</span>: "+ 
                                   errorList[i].message);
         }
-        $("#build").show();
+        
     }
+    else 
+    {
+        $("#build .log").empty();
+        $("#build .log").append("<div><span class='kw'>Votre programme a été complié avec succès.</span><br>"+
+                                "Vous pouvez à présent l'exécuter.</div>");
+        
+    }
+    $("#build .log").append("<div class='dec'><br><br>- Temps de compilation: "+parseTime+"ms</div>");
+    $("#build").show();
 }
 
 /* Warning handler */

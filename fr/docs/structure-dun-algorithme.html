@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../../css/themes.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../fonts/consolas.css">
+    <link rel="stylesheet" href="../../css/docs.css">
+    <link rel="stylesheet" href="../../css/algo.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Structure d'un Algorithme | Documentation | JSPCC</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="left-nav">
+            <div class="mobile" style="height: 100%;">
+                <button class="menu-btn">
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile burger" >
+            <button class="bars-mobile">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="right-nav">
+            <div class="element-container">
+                <a href="../home.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-home"></i> &nbsp; Accueil
+                    </button>
+                </a>
+
+                <a href="../editor.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-code"></i> &nbsp; Editeur de code
+                    </button>
+                </a>
+
+                <a>
+                    <button class="nav-elem">
+                        <i class="fa fa-file-code-o"></i> &nbsp; Documentation
+                    </button>
+                </a>
+
+                <!--<a href="#">
+                    <button class="nav-elem">
+                        <i class="fa fa-bell"></i> &nbsp; Notifications
+                    </button>
+                </a>-->
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-menu">
+        <div class="separator"></div>
+        <h1 style="text-align: center; color: aliceblue;">Documentation</h1>
+        <div class="menu-body">
+            <h2>Générale</h2>
+            <a href="introduction.html">
+                <button class="doc-elem">
+                    Introduction
+                </button>
+            </a>
+            <a href="motcle.html">
+                <button class="doc-elem">
+                    Mots clés
+                </button>
+            </a>
+            <h2>Bases</h2>
+            <a>
+                <button class="doc-elem selected-elem">
+                    Structure d'un Algorithme
+                </button>
+            </a>
+            <a href="declarations.html">
+                <button class="doc-elem">
+                    Déclarations
+                </button>
+            </a>
+            <a href="lecture-ecriture.html">
+                <button class="doc-elem">
+                    Lecture / Ecriture 
+                </button>
+            </a>
+            <a href="conditions.html">
+                <button class="doc-elem">
+                    Conditions 
+                </button>
+            </a>
+            <a href="boucles.html">
+                <button class="doc-elem">
+                    Boucles 
+                </button>
+            </a>
+            <h2>Structures de données</h2>
+            <a href="tableaux.html">
+                <button class="doc-elem">
+                    Tableaux 
+                </button>
+            </a>
+        </div>
+
+        <script>
+            $(document).ready(function()
+            {
+                let on = false;
+                let resized = false;
+
+                $(".menu-btn").on("click", function()
+                {
+                    if(on)
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-left");
+                        $(".menu-btn i").addClass("fa-arrow-right");
+                        $(".doc-menu").animate(
+                        {
+                            left: "-100%"
+                        });
+                        on = false;
+                    }
+                    else 
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-right");
+                        $(".menu-btn i").addClass("fa-arrow-left");
+                        $(".doc-menu").animate(
+                        {
+                            left: "0"
+                        });
+                        on = true;
+                    }
+                })
+
+                $(window).resize(function()
+                {
+                    if($(window).width() > 1024)
+                    {
+                        resized = true;
+                        $(".doc-menu").css("left", "0");
+                        on = false;
+                    }
+                    
+                    if($(window).width() <= 1024 && resized)
+                    {
+                        resized = false;
+                        $(".doc-menu").css("left", "-100%");
+                        on = false;
+                    }
+                    
+                });
+            });
+        </script>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div class="doc-body">
+        <div class="body-content">
+            <h1 class="section-title" style="font-size: 2.5em;">Structure d'un Algorithme</h1>
+            <div class="section-content">
+                <h3 class="section-title section-subtitle">Contenu de la section:</h3>
+                <ul class="content"> 
+                    <li><a href="#str">La structure principale d'un Algorithme</a></li>
+                    <li><a href="#com">Les commentaires</a></li>
+                </ul>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="str">
+                <h3 class="section-title section-subtitle">La structure principale d'un Algorithme</h3>
+                <br>
+                <p class="sec-cont">
+                    La structure principale d'un algorithme se fait comme ceci: 
+                    <br><br>
+
+                    <div class="code-section">
+                        <span class="kw">Algorithme</span> <span style="color: rgb(204, 204, 204);">&lt;Identifiant&gt</span>
+                        <span class="symbol">;</span>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(204, 204, 204);">&lt;Déclarations&gt;</span>
+                        <br>
+                        <span class="kw">Début</span>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(204, 204, 204);">&lt;Action&gt;</span>
+                        <br>
+                        <span class="kw">Fin.</span>
+                    </div>
+                    <br><br>
+
+                    On commencer d'abord par donner un nom à l'Algorithme, on tappant le mot clé 
+                    <span class="kw">Algorithme</span> suivi d'un <span style="color: rgb(204, 204, 204);">&lt;Identifiant&gt;</span> qui représente son nom. 
+                    
+                    <br><br>
+
+                    L'Identifiant doit suivre les règles suivantes:
+                    <ol class="conds-id" id="conds-id">
+                        <li>Doit commencer par une lettre ou un under_score "_".</li>
+                        <li>Ne doit pas comporter de caractère spécial sauf "_".</li>
+                        <li>Peut contenir des chiffres, mais d'abord respecter la condition 1.</li>
+                        <li>Ne doit pas  être un <a style="color: seagreen;" href="motcle.html#mc">mot clé</a>.</li>
+                        <li>Ne doit pas contenir d'espace</li>
+                    </ol>
+                    <br>
+                    Exemples:
+                    <ul class="conds-id">
+                        <li><span style="color: lime;">ident</span></li>
+                        <li><span style="color: red;">debut</span> &nbsp; (Ne doit pas être un mot clé)</li>
+                        <li><span style="color: lime;">_identifiant</span></li>
+                        <li><span style="color: red;">ident-</span> &nbsp; ("-" est un caractère spécial)</li>
+                        <li><span style="color: lime;">ident5</span></li>
+                        <li><span style="color: red;">7ident</span> &nbsp; (Ne doit pas commencer avec un chiffre)</li>
+                        <li><span style="color: lime;">identifiant_1</span></li>
+                        <li><span style="color: red;">ident ifiant</span> &nbsp; (Ne doit pas contenir d'espace)</li>
+                    </ul>
+                    <br>
+                    REMARQUE: Les identifiants peuvent être ce que vous voulez, du moment qu'ils respectent les 5 conditions.
+                    <br><br>
+                    Et enfin, en lui signale que l'on a fini une action avec un point virgule " <span class="symbol">;</span> ". 
+
+                    <br><br>
+                    
+                    Puis nous passons vers la partie &lt;<a style="color: seagreen;" href="declarations.html">Déclaration</a>&gt;, ou l'on va définir les données (les ingédiants)
+                    que la machine va manipuler durant les différentes étapes.
+
+                    <br><br>
+
+                    Puis nous faisons savoir à la machine que les étapes (instructions) de mon algorithme vont commencer. Et cela grâce le mot clé
+                    <span class="kw">Début</span>.
+
+                    <br><br>
+                    Maintenant nous allons donner à la machine les instructions nécessaires pour arriver à notre résultat et ainsi
+                    résoudre notre problème. Les instructions forment ce qu'on appelle la partie <span style="color: rgb(204, 204, 204);">&lt;Action&gt;</span>.
+
+                    <br><br>
+                    Comme dit dans <a style="color: seagreen;" href="introduction.html#def">définition d'un algorithme</a>, Il s'agit d'une suite finie
+                    d'instructions, ce qui veut dire qu'à un certain moment il faut faire savoir à la machine qu'elle est arrivée à la fin de l'algorithme, avec
+                    le mot clé: <span class="kw">Fin.</span>.
+
+                    <br><br><br>
+                    Exemple d'une structure d'algorithme:
+                    <br>
+                    <div class="code-section">
+                        <span class="kw">Algorithme</span> monAlgo<span class="symbol">;</span>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(204, 204, 204);">&lt;Déclarations&gt;</span>
+                        <br>
+                        <span class="kw">Début</span>
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(204, 204, 204);">&lt;Action&gt;</span>
+                        <br>
+                        <span class="kw">Fin.</span>
+                    </div>
+                </p>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="com">
+                <h3 class="section-title section-subtitle">Les commentaires</h3>
+                <br>
+                <p class="sec-cont">
+                    Un commentaire est un bloc de text qui est ignoré par la machine.
+                    <br><br>
+                    Ils sont souvent utilisés pour laisser des notes sur le programme pour soit même ou d'autres personnes
+                    souhaitant comprendre les instructions, ou alors planifier, ou communiquer une information à propos d'un
+                    morceau de code.
+                    <br><br>
+                    On dispose de 2 types de commentaires:
+                    <br><br>
+                    - Les commentaires sur 1 ligne: On commence par ecrire // pour dire à la machine que
+                    tout ce qui est écrit dans cette ligne est à ignorer.
+                    <br> 
+                    <div class="code-section">
+                        <span class="com">//Ceci est un commentaire.</span> 
+                        <br>
+                        Ceci n'est pas un commentaire.
+                    </div>
+                    <br><br>
+                    - Les commentaires sur plusieurs lignes (un bloc): On met notre commentaire entre /* */ pour dire à 
+                    la machine à partir de /* tout ce qui vient après est un commentaire, jusqu'à ce qu'elle trouve */
+                    <br> 
+                    <div class="code-section">
+                        <span class="com">/* Ceci <br> est <br> un <br> commentaire. */</span> 
+                        <br>
+                        Ceci n'est pas un commentaire.
+                    </div>
+                </p>
+            </div>
+
+        </div>
+
+        <br><br><br>
+    </div>
+</body>
+</html>

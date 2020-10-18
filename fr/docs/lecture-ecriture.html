@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../../css/themes.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../fonts/consolas.css">
+    <link rel="stylesheet" href="../../css/docs.css">
+    <link rel="stylesheet" href="../../css/algo.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Lecture / Ecriture | Documentation | JSPCC</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="left-nav">
+            <div class="mobile" style="height: 100%;">
+                <button class="menu-btn">
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile burger" >
+            <button class="bars-mobile">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="right-nav">
+            <div class="element-container">
+                <a href="../home.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-home"></i> &nbsp; Accueil
+                    </button>
+                </a>
+
+                <a href="../editor.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-code"></i> &nbsp; Editeur de code
+                    </button>
+                </a>
+
+                <a>
+                    <button class="nav-elem">
+                        <i class="fa fa-file-code-o"></i> &nbsp; Documentation
+                    </button>
+                </a>
+
+                <!--<a href="#">
+                    <button class="nav-elem">
+                        <i class="fa fa-bell"></i> &nbsp; Notifications
+                    </button>
+                </a>-->
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-menu">
+        <div class="separator"></div>
+        <h1 style="text-align: center; color: aliceblue;">Documentation</h1>
+        <div class="menu-body">
+            <h2>Générale</h2>
+            <a href="introduction.html">
+                <button class="doc-elem">
+                    Introduction
+                </button>
+            </a>
+            <a href="motcle.html">
+                <button class="doc-elem">
+                    Mots clés
+                </button>
+            </a>
+            <h2>Bases</h2>
+            <a href="structure-dun-algorithme.html">
+                <button class="doc-elem">
+                    Structure d'un Algorithme
+                </button>
+            </a>
+            <a href="declarations.html">
+                <button class="doc-elem">
+                    Déclarations
+                </button>
+            </a>
+            <a>
+                <button class="doc-elem selected-elem">
+                    Lecture / Ecriture 
+                </button>
+            </a>
+            <a href="conditions.html">
+                <button class="doc-elem">
+                    Conditions 
+                </button>
+            </a>
+            <a href="boucles.html">
+                <button class="doc-elem">
+                    Boucles 
+                </button>
+            </a>
+            <h2>Structures de données</h2>
+            <a href="tableaux.html">
+                <button class="doc-elem">
+                    Tableaux 
+                </button>
+            </a>
+        </div>
+
+        <script>
+            $(document).ready(function()
+            {
+                let on = false;
+                let resized = false;
+
+                $(".menu-btn").on("click", function()
+                {
+                    if(on)
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-left");
+                        $(".menu-btn i").addClass("fa-arrow-right");
+                        $(".doc-menu").animate(
+                        {
+                            left: "-100%"
+                        });
+                        on = false;
+                    }
+                    else 
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-right");
+                        $(".menu-btn i").addClass("fa-arrow-left");
+                        $(".doc-menu").animate(
+                        {
+                            left: "0"
+                        });
+                        on = true;
+                    }
+                })
+
+                $(window).resize(function()
+                {
+                    if($(window).width() > 1024)
+                    {
+                        resized = true;
+                        $(".doc-menu").css("left", "0");
+                        on = false;
+                    }
+                    
+                    if($(window).width() <= 1024 && resized)
+                    {
+                        resized = false;
+                        $(".doc-menu").css("left", "-100%");
+                        on = false;
+                    }
+                    
+                });
+            });
+        </script>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div class="doc-body">
+        <div class="body-content">
+            <h1 class="section-title" style="font-size: 2.5em;">Lecture / Ecriture</h1>
+            <div class="section-content">
+                <h3 class="section-title section-subtitle">Contenu de la section:</h3>
+                <ul class="content"> 
+                    <li><a href="#def">Opération sur des chiffres</a></li>
+                    <li><a href="#decc">Opération sur des variables et constantes</a></li>
+                    <li><a href="#decv">Déclaration de variables</a></li>
+                    <li><a href="#datatype">Types de données</a></li>
+                </ul>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="def">
+                <h3 class="section-title section-subtitle">Constantes et variables</h3>
+                <br>
+                <p class="sec-cont">
+                    Nous allons voir les données qui seront manipulées par la machine afin de pouvoir
+                    résoudre un problème.
+
+                    <br><br>
+
+                    Nous avons deux genre de données: <span class="impo-word">Les constantes</span> et <span class="impo-word">les variables</span>.
+
+                    <br><br>
+                    <span class="impo-word">Une constante</span> est une donnée dont on donne la valeur avent de passer à l'exécution des 
+                    instructions, et cette valeur ne pourra plus être changée lorsque la machine commance 
+                    à exécuter les instructions.
+
+                    <br><br>
+                    <span class="impo-word">Une variable</span> est une donnée dont on donne la valeur durant l'exécution des 
+                    instructions, et cette valeur pourra être écrasée (changée) lors des opérations de 
+                    <a style="color: seagreen;" href="lecture-ecriture.html#lec">lecture</a>.
+
+                    <br><br>
+                    Les constantes et variables sont représentées comme des <span class="impo-word">cases dans la mémoire</span> (RAM) ou l'on
+                    peut y inserer des valeurs. Pour accéder à ces cases, la machine utilise leurs <span class="impo-word">Adresses</span>.
+
+                    <br><br>
+                    Voici une représentation d'une case mémoire:
+                    <br><br>
+                    <img src="../images/cmemoire.png" style="width: 200px;" alt="case mémoire">
+
+                    <br><br>
+                    L'opération de déclaration décrit la <span class="impo-word">réservation</span> d'une case mémoire dans la RAM 
+                    . La machine demande au système d'exploitation (par exemple: Windows, MAC, Linux...etc) de lui réserver une case 
+                    dans laquelle aucun autre programme n'aura le droit d'y accéder (un peu comme si vous achetez une maison et que 
+                    personne n'a le droit d'y entrer sauf vous, une case mémoire c'est un peu une maison... pour les données)
+                    
+                    <br><br>
+                    On accède à la case mémoire en utilisant son adresse, mais ne vous inquetez pas, vous n'aurez pas à connaitre l'adresse
+                    car on va associer à chaque case mémoire une étiquette (identifiant) et ainsi on pourra utiliser la case avec. 
+                </p>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="decc">
+                <h3 class="section-title section-subtitle">Déclaration de constantes</h3>
+                <br>
+                <p class="sec-cont">
+                    Voici la structure de la déclaration d'une constante:
+                    <br>
+                    <div class="code-section">
+                        <span class="dec">Const</span> <span style="color: rgb(204, 204, 204);">&lt;Identifiant&gt</span>
+                        <span class="symbol">=</span> <span class="valuenum">&lt;Valeur&gt;</span><span class="symbol">;</span>
+                    </div>
+                    <br>
+                    
+                </p>
+
+                <p class="sec-cont">
+                    Bien sûre l'identifiant doit être unique, car on va l'utiliser pour dire à la machine 
+                    dans quelle case mémoire on souhaite accéder.
+
+                    <br><br>
+
+                    Tout comme pour l'identifiant d'un algorithme, on doit respecter les même 
+                    <a style="color: seagreen;" href="structure-dun-algorithme.html#conds-id">conditions</a>.
+
+                    <br>
+                    La valeur doit appartenir à l'un des <a style="color: seagreen;" href="#datatype">types</a>.
+                
+                    <br><br><br>
+                    Exemple d'une déclaration de constante:
+                    <br>
+                    <div class="code-section">
+                        <span class="dec">Const</span> ma_constante
+                        <span class="symbol">=</span> <span class="valuenum">10</span><span class="symbol">;</span>
+                    </div>
+                    <br><br>
+                    On peut déclarer plusieurs constantes:
+                    <div class="code-section">
+                        <span class="dec">Const</span> ma_constante1
+                        <span class="symbol">=</span> <span class="valuenum">15</span><span class="symbol">;</span>
+                        <span class="com">//entier</span>
+                        <br>
+                        <span class="dec">Const</span> ma_constante2
+                        <span class="symbol">=</span> <span class="valuenum">1.5</span><span class="symbol">;</span>
+                        <span class="com">//réel</span>
+                        <br>
+                        <span class="dec">Const</span> ma_constante3
+                        <span class="symbol">=</span> <span class="valuechar">'a'</span><span class="symbol">;</span>
+                        <span class="com">//caractère</span>
+                        <br>
+                        <span class="dec">Const</span> ma_constante4
+                        <span class="symbol">=</span> <span class="valuebool">Faux</span><span class="symbol">;</span>
+                        <span class="com">//booléen</span>
+                    </div>
+                </p>
+                
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="decv">
+                <h3 class="section-title section-subtitle">Déclaration de variables</h3>
+                <br>
+                <p class="sec-cont">
+                    Voici la structure de la déclaration d'une variable:
+                    <br>
+                    <div class="code-section">
+                        <span class="dec">Var</span> <span style="color: rgb(204, 204, 204);">&lt;Identifiants&gt;</span>
+                        <span class="symbol">:</span> <span class="dec">&lt;Type&gt;</span><span class="symbol">;</span>
+                    </div>
+                    <br><br>
+                    C'est très similaire à la déclaration d'une constante, sauf qu'ici on ne donne pas la valeur lors de la déclaration.
+                    Au lieu de cela nous donnons à la machine le type de cette case, c-à-d le type de valeurs 
+                    cette case va pouvoir contenir.
+                    <br><br>
+                    Je voudrais attirer votre attention sur &lt;Identifiants&gt; je l'ai ecrit avec S, et non ce n'est pas une faute
+                    j'ai fait ça expres. Tout simplement parce-que on peut avoir une liste d'identifiant séparés par une virgule, ayant tous le même type.
+                    <br><br>
+                    Cela ce fait comme ceci:
+                    <div class="code-section">
+                        <span class="dec">Var</span> 
+                        id1<span class="symbol">,</span>
+                        id2<span class="symbol">,</span>
+                        id3<span class="symbol">,</span>
+                        ...<span class="symbol">,</span>
+                        idn<span class="symbol">,</span>
+                        <span class="symbol">:</span> <span class="dec">&lt;Type&gt;</span><span class="symbol">;</span>
+                    </div>
+                    <br><br>
+                    Bien sûre, le type doit être l'un de ceux présents <a style="color:seagreen" href="#datatype">ici</a>.
+                    <br><br>
+                    Exemple: 
+                    <div class="code-section">
+                        <span class="dec">Var</span> 
+                        ma_variable1<span class="symbol">,</span>
+                        ma_variable2<span class="symbol">
+                        <span class="symbol">:</span> <span class="dec">Entier</span><span class="symbol">;</span>
+                    </div>
+                    <br><br>
+                    Il est possible de créer des variables de différentes façon:
+
+                    <div class="code-section">
+                        <span class="com">//Une seule variable</span>
+                        <br>
+                        <span class="dec">Var</span> 
+                        ma_variable1
+                        <span class="symbol">:</span> <span class="dec">Entier</span><span class="symbol">;</span>
+                        
+                        <br><br>
+
+                        <span class="com">//Plusieurs variables du même type</span>
+                        <br>
+                        <span class="dec">Var</span> 
+                        var1, var2, var3, var4
+                        <span class="symbol">:</span> <span class="dec">Entier</span><span class="symbol">;</span>
+                        
+                        <br><br>
+                        
+                        <span class="com">//Variables de différent types</span>
+                        <br>
+                        <span class="dec">Var</span> 
+                        var5, var6, var7, var8
+                        <span class="symbol">:</span> <span class="dec">Entier</span><span class="symbol">;</span>
+                        <br>
+                        <span class="dec">Var</span> 
+                        var9, var10, var11, var12
+                        <span class="symbol">:</span> <span class="dec">Réel</span><span class="symbol">;</span>
+                        <br><br>
+
+                        <span class="com">// Variables de différent types 2ème méthode.</span>
+                        <br>
+                        <span class="dec">Var</span> 
+                        var13, var14, var15, var16
+                        <span class="symbol">:</span> <span class="dec">Entier</span><span class="symbol">;</span>
+                        <br>
+                        
+                        var17, var18, var19, var20
+                        <span class="symbol">:</span> <span class="dec">Réel</span><span class="symbol">;</span>
+                        <br><br>
+                    </div>
+                </p>
+                
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="datatype">
+                <h3 class="section-title section-subtitle">Les types de données</h3>
+                <br>
+                <p class="sec-cont">
+                    <table class="kw-table">
+                        <tr>
+                            <th>Type de donnée</th>
+                            <th>Valeur possible</th>
+                        </tr>
+                        <tr>
+                            <td class="dec">Entier</td>
+                            <td>entre 
+                                &nbsp;&nbsp;
+                                <span class="valuenum">-2,147,483,648</span> 
+                                &nbsp;&nbsp; 
+                                et 
+                                &nbsp;&nbsp;
+                                <span class="valuenum">2,147,483,647</span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="dec">Réel | Reel</td>
+                            <td>entre 
+                                &nbsp;&nbsp;
+                                <span class="valuenum">3.4 * 10<sup>-38</sup></span> 
+                                &nbsp;&nbsp; 
+                                et 
+                                &nbsp;&nbsp;
+                                <span class="valuenum">3.4 * 10<sup>38</sup></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="dec">Caractère | Caractere</td>
+                            <td>
+                                Tout les caractères du clavier
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="dec">Booléen | Booleen</td>
+                            <td>
+                                soit 
+                                &nbsp;&nbsp;
+                                <span class="valuebool">Vrai</span> 
+                                &nbsp;&nbsp; 
+                                ou 
+                                &nbsp;&nbsp;
+                                <span class="valuebool">Faux</span>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+            </div>
+
+        </div>
+
+        <br><br><br>
+    </div>
+</body>
+</html>

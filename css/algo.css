@@ -28,6 +28,7 @@ body
     padding-top: 10px;
     position: absolute;
     z-index: 100;
+    animation: none;
     top: 0;
     left: 0;
     width: 100%;
@@ -85,6 +86,16 @@ body
     color: rgb(20, 207, 82);
 }
 
+.valuebool 
+{
+    color: rgb(179, 207, 20);
+}
+
+.valuechar 
+{
+    color: rgb(207, 163, 20);
+}
+
 .symbol 
 {
     font-weight: bold;
@@ -101,6 +112,17 @@ body
 {
     font-weight: bold;
     color: rgb(200, 76, 238);
+}
+
+.com 
+{
+    color: rgba(119, 119, 119, 0.781);
+}
+
+.transm
+{
+    font-weight: bold;
+    color: rgb(182, 47, 7);
 }
 
 .valuenum
@@ -132,7 +154,7 @@ body
     color: rgb(216, 216, 216);
 }
 
-.parsebtn,.execbtn,.uploadbtn 
+.parsebtn,.execbtn,.uploadbtn,.downloadbtn 
 {
     width: 70px;
     height: 50px;
@@ -267,7 +289,7 @@ body
         height: 80vh;
     }
 
-    .parsebtn-mobile,.execbtn-mobile, .uploadbtn-mobile
+    .parsebtn-mobile, .execbtn-mobile, .uploadbtn-mobile, .downloadbtn-mobile
     {
         width: 70px;
         height: 50px;

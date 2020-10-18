@@ -2,7 +2,6 @@ $(document).ready(function()
 {   
     $('input[type="file"]').change(function(e){
         var myFile = $(this).prop('files')[0];
-        console.log("entered here");
         readFile(myFile).then(content => 
         {
             $("#txtcode").val(content);
@@ -12,7 +11,6 @@ $(document).ready(function()
             $('input[type="file"]').val(null);
         });
     });
-
 
     function readFile(file)
     {
@@ -41,8 +39,8 @@ $(document).ready(function()
                       + $(this).val().substring(end));
       
           // put caret at right position again
-          this.selectionStart =
           this.selectionEnd = start + 4;
+          updateEditor();
         }
     });
 
@@ -106,33 +104,118 @@ function getKeyWords(code)
     let curr_char = 0;
     let curr_token = "";
     let inside_string = false;
+    let inline_com = false;
+
+    let multiline_com = false;
+
     while(curr_char < code.length)
     {
-        if(code[curr_char] == '"')
+        if(!multiline_com && !inline_com && code[curr_char] == '"')
         {
             inside_string = !inside_string;
         }
 
-        if(!AnalysisStoppers(code[curr_char]) || inside_string)
+        if(!multiline_com &&
+           !inline_com &&
+           !inside_string && 
+           code[curr_char] == "/" && 
+           curr_char+1 < code.length  && 
+           code[curr_char+1] == "/")
+        {
+            curr_token += "//";
+            curr_char += 2;
+            inline_com = true;
+            continue;
+        }
+
+        if(!multiline_com &&
+            !inline_com &&
+            !inside_string && 
+            code[curr_char] == "/" && 
+            curr_char+1 < code.length  && 
+            code[curr_char+1] == "*")
+        {
+            curr_token += "/*";
+            curr_char += 2;
+            multiline_com = true;
+            continue;
+        }
+
+        if( multiline_com &&
+            !inline_com &&
+            !inside_string && 
+            code[curr_char] == "*" && 
+            curr_char+1 < code.length  && 
+            code[curr_char+1] == "/")
+        {
+            curr_token += "*/";
+            newcode += highlight(curr_token);
+            curr_char += 2;
+            multiline_com = false;
+            curr_token = ""
+            if(curr_char >= code.length)
+            {
+                break;
+            }
+        }
+  
+
+        if(!AnalysisStoppers(code[curr_char]) || 
+                             inside_string || 
+                             (inline_com && !code[curr_char].match(/^\n$/)) || 
+                             multiline_com)
         {
             curr_token += code[curr_char];
         }
         else 
         {
+            inline_com = false;
             newcode += highlight(curr_token);
             curr_token = code[curr_char];
             newcode += highlight(curr_token);
             curr_token = "";
         }
-
+        console.log(curr_token);
         curr_char++;
     } 
     newcode += highlight(curr_token);
-    return newcode
+    return newcode.split("\n").join("<br>")
 }
 
 function highlight(m_token)
 {
+    if(/^\/\/.*$/.test(m_token))
+    {
+        return "<span class='com'>"+m_token.split(" ").join("&nbsp;")+"</span>";
+    }
+
+    if(/\*[^*]*\*+(?:[^\/\*][^*]*\*+)*\/$/.test(m_token))
+    {
+        let res = m_token.split(" ").join("&nbsp;");
+        res = res.split("\n").join("<br>");
+        return "<span class='com'>"+res+"</span>";
+    }
+
+    if(/^[Ee]$/.test(m_token))
+    {
+        return "<span class='transm'>"+m_token+"</span>";
+    }
+
+    if(/^[Ss]$/.test(m_token))
+    {
+        return "<span class='transm'>"+m_token+"</span>";
+    }
+
+    if(/^[Ee][Ss]$/.test(m_token))
+    {
+        return "<span class='transm'>"+m_token+"</span>";
+    }
+
+    if(/^[Rr][Ee][Ff]$/.test(m_token))
+    {
+        return "<span class='transm'>"+m_token+"</span>";
+    }
+
     if(/^[Vv][Aa][Rr]$/.test(m_token))
     {
         return "<span class='dec'>"+m_token+"</span>";
@@ -300,7 +383,7 @@ function highlight(m_token)
 
     if(/^\".*\"$/.test(m_token))
     {
-        return "<span class='valuestring'>"+m_token+"</span>";
+        return "<span class='valuestring'>"+m_token.split(" ").join("&nbsp;")+"</span>";
     }
 
     if(/^\+$/.test(m_token))
@@ -395,4 +478,19 @@ function highlight(m_token)
 function closeConsoles()
 {
     $(".consoles").hide();
+}
+
+function downloadFile()
+{
+    var text = $("#txtcode").val();
+    text = text.replace(/\n/g, "\r\n");
+    var blob = new Blob([text], { type: "text/plain"});
+    var anchor = document.createElement("a");
+    anchor.download = "my-filename.jspcc";
+    anchor.href = window.URL.createObjectURL(blob);
+    anchor.target ="_blank";
+    anchor.style.display = "none";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
 }

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="../../css/themes.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../fonts/consolas.css">
+    <link rel="stylesheet" href="../../css/docs.css">
+    <link rel="stylesheet" href="../../css/algo.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Mots clés | Documentation | JSPCC</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="left-nav">
+            <div class="mobile" style="height: 100%;">
+                <button class="menu-btn">
+                    <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mobile burger" >
+            <button class="bars-mobile">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="right-nav">
+            <div class="element-container">
+                <a href="../home.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-home"></i> &nbsp; Accueil
+                    </button>
+                </a>
+
+                <a href="../editor.html">
+                    <button class="nav-elem">
+                        <i class="fa fa-code"></i> &nbsp; Editeur de code
+                    </button>
+                </a>
+
+                <a>
+                    <button class="nav-elem">
+                        <i class="fa fa-file-code-o"></i> &nbsp; Documentation
+                    </button>
+                </a>
+
+                <!--<a href="#">
+                    <button class="nav-elem">
+                        <i class="fa fa-bell"></i> &nbsp; Notifications
+                    </button>
+                </a>-->
+            </div>
+        </div>
+    </nav>
+
+    <div class="doc-menu">
+        <div class="separator"></div>
+        <h1 style="text-align: center; color: aliceblue;">Documentation</h1>
+        <div class="menu-body">
+            <h2>Générale</h2>
+            <a href="introduction.html">
+                <button class="doc-elem">
+                    Introduction
+                </button>
+            </a>
+            <a>
+                <button class="doc-elem selected-elem">
+                    Mots clés
+                </button>
+            </a>
+            <h2>Bases</h2>
+            <a href="structure-dun-algorithme.html">
+                <button class="doc-elem">
+                    Structure d'un Algorithme
+                </button>
+            </a>
+            <a href="declarations.html">
+                <button class="doc-elem">
+                    Déclarations
+                </button>
+            </a>
+            <a href="lecture-ecriture.html">
+                <button class="doc-elem">
+                    Lecture / Ecriture 
+                </button>
+            </a>
+            <a href="conditions.html">
+                <button class="doc-elem">
+                    Conditions 
+                </button>
+            </a>
+            <a href="boucles.html">
+                <button class="doc-elem">
+                    Boucles 
+                </button>
+            </a>
+            <h2>Structures de données</h2>
+            <a href="tableaux.html">
+                <button class="doc-elem">
+                    Tableaux 
+                </button>
+            </a>
+        </div>
+
+        <script>
+            $(document).ready(function()
+            {
+                let on = false;
+                let resized = false;
+
+                $(".menu-btn").on("click", function()
+                {
+                    if(on)
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-left");
+                        $(".menu-btn i").addClass("fa-arrow-right");
+                        $(".doc-menu").animate(
+                        {
+                            left: "-100%"
+                        });
+                        on = false;
+                    }
+                    else 
+                    {
+                        $(".menu-btn i").removeClass("fa-arrow-right");
+                        $(".menu-btn i").addClass("fa-arrow-left");
+                        $(".doc-menu").animate(
+                        {
+                            left: "0"
+                        });
+                        on = true;
+                    }
+                })
+
+                $(window).resize(function()
+                {
+                    if($(window).width() > 1024)
+                    {
+                        resized = true;
+                        $(".doc-menu").css("left", "0");
+                        on = false;
+                    }
+                    
+                    if($(window).width() <= 1024 && resized)
+                    {
+                        resized = false;
+                        $(".doc-menu").css("left", "-100%");
+                        on = false;
+                    }
+                    
+                });
+            });
+        </script>
+    </div>
+    
+    <div class="separator"></div>
+
+    <div class="doc-body">
+        <div class="body-content">
+            <h1 class="section-title" style="font-size: 2.5em;">Mots clés</h1>
+            <div class="section-content">
+                <h3 class="section-title section-subtitle">Contenu de la section:</h3>
+                <ul class="content"> 
+                    <li><a href="#def">Qu'est ce qu'un mot clé ?</a></li>
+                    <li><a href="#mc">Les mots clés du Pseudo-code</a></li>
+                </ul>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="def">
+                <h3 class="section-title section-subtitle">Qu'est ce qu'un mot clé ?</h3>
+                <br>
+                <p class="sec-cont">
+                    Les mots clés sont des mots qui sont propre à un langages donné, et qui possède une définition 
+                    ainsi qu'une utilisation précise.
+                    
+                    <br><br>
+                    
+                    Par exemple, dans la langue Française, l'un des mots clés est: <b style="color: rgb(83, 168, 168);">Aimer</b>
+                    
+                    <br><br>
+                    
+                    Par exemple On ne peux pas utiliser ce mot pour nommer une personne, 
+                    car il est déjà réservé pour une autre utilisation (exprimer l'amour).
+
+                    <br><br>
+
+                    En revanche, le mot <b style="color: rgb(83, 168, 168);">Anis</b> n'est pas un mot clé
+                    car il n'existe pas dans le dictionnaire Français. Dans ce cas, on peut l'utiliser comme nom (Identifiant).
+
+                    <br><br>
+
+                    C'est pareil pour le Pseudo-code, il existe un dictionnaire qui comporte les mots du langages et leurs définitions 
+                    (leurs utilisation en quelque sorte), donc quand la machine trouve ce mot, elle fera quelques chose selon sa définition dans le dictionnaire.
+                </p>
+            </div>
+
+            <br><br><br>
+
+            <div class="section-content" id="mc">
+                <h3 class="section-title section-subtitle">Les mots clés du Pseudo-code</h3>
+                <br>
+                <p class="sec-cont">
+                    <table class="kw-table">
+                        <tr>
+                            <th colspan="6">Mots clés</th>
+                        </tr>
+                        <tr>
+                            <td class="kw">Algorithme</td>
+                            <td class="kw">Début <br> Debut</td>
+                            <td class="kw">Fin.</td>
+                            <td class="dec">Var</td>
+                            <td class="dec">Const</td>
+                            <td class="dec">Entier</td>
+                        </tr>
+                        <tr>
+                            <td class="dec">Réel <br> Reel</td>
+                            <td class="dec">Caractère <br> Caractere</td>
+                            <td class="dec">à</td>
+                            <td class="dec">Si</td>
+                            <td class="dec">Fsi</td>
+                            <td class="dec">Sinon</td>
+                        </tr>
+                        <tr>
+                            
+                            <td class="dec">Repeter <br> Répéter <br> Répeter <br> Repéter</td> 
+                            <td class="dec">Jusqua <br> Jusqu'a <br> Jusqu'à <br> Jusquà</td>
+                            <td class="dec">Ftq</td>
+                            <td class="dec">Alors</td>
+                            <td class="transm">E</td>
+                            <td class="transm">S</td>
+                        </tr>
+                        <tr>
+                            <td class="dec">Booléen <br> Booleen</td>
+                            <td class="dec">Tantque</td>
+                            <td class="dec">Pour</td>
+                            <td class="dec">Fpour</td>
+                            <td class="transm">ES</td>
+                            <td class="transm">Ref</td>
+                        </tr>
+                        <tr>
+                            <td class="dec">Fonction</td>
+                            <td class="dec">Procédure <br> Procedure</td>
+                            <td class="rw">Lire</td>
+                            <td class="rw">Ecrire <br> <span style="text-transform: uppercase;">é</span>crire</td>
+                            <td class="valuebool">Vrai</td>
+                            <td class="valuebool">Faux</td>
+                        </tr>
+                    </table>
+                </p>
+            </div>
+
+        </div>
+
+        <br><br><br>
+    </div>
+</body>
+</html>

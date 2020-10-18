@@ -1,4 +1,8 @@
-
+.separator 
+{
+    width: 100%;
+    height: 60px;
+}
 
 .navbar 
 {
@@ -8,6 +12,8 @@
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+    position: fixed;
+    z-index: 100;
 }
 
 .logo
@@ -29,6 +35,7 @@
     margin-right: 5px;
     outline: none;
     cursor: pointer;
+    font-family: 'Cairo';
 }
 
 .nav-elem:hover 
@@ -125,6 +132,8 @@
 {
     display: none;
 }
+
+
 
 @media only screen and (max-width: 1024px)
 {

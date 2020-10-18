@@ -1,0 +1,195 @@
+.doc-menu 
+{
+    width: 250px;
+    height: 100vh;
+    background-color: rgb(41, 43, 54);
+    position: fixed;
+    z-index: 99;
+    top: 0;
+    overflow: auto;
+    font-family: 'Cairo';
+    color: white;
+}
+
+.menu-body 
+{
+    margin-top: 15px;
+    color: rgba(190, 190, 190, 0.884);
+}
+
+.conds-id 
+{
+    margin-left: 25px;
+    margin-top: 5px;
+}
+
+.impo-word 
+{
+    color: skyblue;
+    font-weight: bold;
+}
+
+.code-section
+{
+    padding: 20px;
+    background-color: rgb(29, 29, 29);
+    font-family: "Consolas";
+}
+
+.menu-body h2
+{
+    margin-left: 10px;
+}
+
+.doc-elem 
+{
+    outline: none;
+    font-family: 'Cairo';
+    width: 100%;
+    height: 50px;
+    padding-left: 15px;
+    font-size: 1em;
+    border: none;
+    background-color: rgb(36, 38, 46);
+    color: white;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+}
+
+.kw-table 
+{
+    width: 100%;
+}
+
+.kw-table, .kw-table th, .kw-table td 
+{
+    border: 2px solid rgb(75, 133, 92);
+    border-collapse: collapse;
+}
+
+.kw-table td 
+{
+    padding: 5px;
+}
+
+.kw-table th, .kw-table td 
+{
+    text-align: center;
+    height: 40px;
+}
+
+.body-content
+{
+    width: 85%;
+    margin-left: 35px;
+}
+
+.section-content 
+{
+    font-family: 'Roboto';
+}
+
+.content a 
+{
+    color: rgb(75, 133, 92);
+}
+
+.content a:hover 
+{
+    color: rgb(50, 153, 50);
+}
+
+.content li 
+{
+    margin-top: 15px;
+}
+
+.content
+{
+    color: rgb(75, 133, 92);
+    margin-left: 35px;
+}
+
+.doc-elem:hover 
+{
+    background-color: rgb(50, 153, 50);
+}
+
+.selected-elem 
+{
+    background-color: rgb(50, 153, 50);
+}
+
+.doc-body 
+{
+    margin-left: 250px;
+    color: white;
+}
+
+.section-title 
+{
+    font-family: 'Cairo';
+}
+
+.sec-cont 
+{
+    margin-left: 15px;
+}
+
+.section-subtitle
+{
+    color: rgb(184, 184, 184);
+}
+
+/* width */
+.doc-menu::-webkit-scrollbar 
+{
+    width: 5px;
+}
+
+/* Track */
+.doc-menu::-webkit-scrollbar-track 
+{
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;
+}
+
+/* Handle */
+.doc-menu::-webkit-scrollbar-thumb 
+{
+    background: rgb(75, 133, 92); 
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+.doc-menu::-webkit-scrollbar-thumb:hover 
+{
+    background: #048b22; 
+}
+
+@media only screen and (max-width: 1024px)
+{
+    .doc-menu
+    {
+        left: -100%;
+    }
+
+    .menu-btn
+    {
+        height: 100%;
+        border: none;
+        background-color: rgb(56, 59, 75);
+        color: white;
+        padding: 15px;
+        font-size: 1em;
+        outline: none;
+        cursor: pointer;
+        width: 55px;
+    }
+
+    .doc-body
+    {
+        margin-left: 0;
+    }
+}

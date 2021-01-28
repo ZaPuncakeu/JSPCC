@@ -44,13 +44,32 @@ const parse = (token_list) =>
 
     if(error_list.length == 0)
     {
+        $("#build .log").empty();
+        $("#build .log").append("<div><span class='kw'>Votre programme a été complié avec succès.</span><br>"+
+                                "Vous pouvez à présent l'exécuter.</div>");
+        
+        $("#build").show();
         return {
             tree: program_tree,
             main_index: main_index
         }
     }
-
-    return null;
+    else 
+    {
+        $("#build .log").empty();
+        for(let i = 0; i < error_list.length; i++)
+        {
+            $("#build .log").append("<div><span class='error'>ERREUR! ligne "+error_list[i].line+""+
+                                ", colonne "+ error_list[i].col + "</span>: "+ 
+                                error_list[i].message);
+        }
+        
+        $("#build").show();
+    }
+    return {
+        tree: null,
+        main_index: null
+    }
 }
 
 const program_root = () =>

@@ -1,6 +1,6 @@
-import lex from "./lex";
-import parse from "./components/syntax";
-import semantics from "./components/semantic";
+import lex from "./components/lex.js";
+import parse from "./components/syntax.js";
+import semantics from "./components/semantic.js";
 
 let ptree;
 let mainf;

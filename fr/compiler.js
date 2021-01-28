@@ -1,4 +1,4 @@
-import lex from "./components/lex";
+import lex from "lex";
 import parse from "./components/syntax";
 import semantics from "./components/semantic";
 

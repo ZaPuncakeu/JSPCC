@@ -82,7 +82,6 @@ body
 
 .kw 
 {
-    font-weight: bold;
     color: rgb(20, 207, 82);
 }
 
@@ -98,19 +97,16 @@ body
 
 .symbol 
 {
-    font-weight: bold;
     color: rgb(204, 36, 24);
 }
 
 .dec,.instr 
 {
-    font-weight: bold;
     color: rgb(11, 137, 240);
 }
 
 .rw 
 {
-    font-weight: bold;
     color: rgb(200, 76, 238);
 }
 
@@ -121,7 +117,6 @@ body
 
 .transm
 {
-    font-weight: bold;
     color: rgb(182, 47, 7);
 }
 

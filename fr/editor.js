@@ -1,3 +1,6 @@
+import {AnalysisStoppers} from './components/lex.js'
+import {compile} from './compiler.js';
+
 $(document).ready(function()
 {   
     $('input[type="file"]').change(function(e){
@@ -6,8 +9,7 @@ $(document).ready(function()
         {
             $("#txtcode").val(content);
             updateEditor();
-            Parse();
-            exec();
+            compile();
             $('input[type="file"]').val(null);
         });
     });
@@ -88,23 +90,12 @@ function KeyWords(kw)
 
 function getKeyWords(code)
 {
-    let c = code.split(" ");
-    for(let i = 0; i < c.length; i++)
-    {
-        switch(c[i])
-        {
-
-        }
-    }
-}
-
-function getKeyWords(code)
-{
     let newcode = "";
     let curr_char = 0;
     let curr_token = "";
     let inside_string = false;
     let inline_com = false;
+    let is_number = false;
 
     let multiline_com = false;
 
@@ -158,24 +149,29 @@ function getKeyWords(code)
                 break;
             }
         }
-  
+        
+        if(!isNaN(code[curr_char]))
+        {
+            is_number = true;
+        }
 
         if(!AnalysisStoppers(code[curr_char]) || 
                              inside_string || 
                              (inline_com && !code[curr_char].match(/^\n$/)) || 
-                             multiline_com)
+                             multiline_com ||
+                             (is_number && code[curr_char].match(/^\.$/)))
         {
             curr_token += code[curr_char];
         }
         else 
         {
             inline_com = false;
+            is_number = false;
             newcode += highlight(curr_token);
             curr_token = code[curr_char];
             newcode += highlight(curr_token);
             curr_token = "";
         }
-        console.log(curr_token);
         curr_char++;
     } 
     newcode += highlight(curr_token);
@@ -194,6 +190,16 @@ function highlight(m_token)
         let res = m_token.split(" ").join("&nbsp;");
         res = res.split("\n").join("<br>");
         return "<span class='com'>"+res+"</span>";
+    }
+
+    if(/^[Ff][Oo][Nn][Cc][Tt][Ii][Oo][Nn]$/.test(m_token))
+    {
+        return "<span class='kw'>"+m_token+"</span>";
+    }
+
+    if(/^[Pp][Rr][Oo][Cc][Ee|Éé][Dd][Uu][Rr][Ee]$/.test(m_token))
+    {
+        return "<span class='kw'>"+m_token+"</span>";
     }
 
     if(/^[Ee]$/.test(m_token))
@@ -276,7 +282,7 @@ function highlight(m_token)
         return "<span class='kw'>"+m_token+"</span>";
     }
 
-    if(/^[Ff][Ii][Nn]\.$/.test(m_token))
+    if(/^[Ff][Ii][Nn]$/.test(m_token))
     {
         return "<span class='kw'>"+m_token+"</span>";
     }
@@ -381,6 +387,11 @@ function highlight(m_token)
         return "<span class='valuechar'>"+m_token+"</span>";
     }
 
+    if(/^[Rr][Ee][Tt][Oo][Uu][Rr][Nn][Ee][Rr]$/.test(m_token))
+    {
+        return "<span class='instr'>"+m_token+"</span>";
+    }
+
     if(/^\".*\"$/.test(m_token))
     {
         return "<span class='valuestring'>"+m_token.split(" ").join("&nbsp;")+"</span>";
@@ -451,7 +462,17 @@ function highlight(m_token)
         return "<span class='symbol'>"+m_token+"</span>";
     }
 
+    if(/^\.$/.test(m_token))
+    {
+        return "<span class='symbol'>"+m_token+"</span>";
+    }
+
     if(/^\,$/.test(m_token))
+    {
+        return "<span class='symbol'>"+m_token+"</span>";
+    }
+
+    if(/^\&$/.test(m_token))
     {
         return "<span class='symbol'>"+m_token+"</span>";
     }

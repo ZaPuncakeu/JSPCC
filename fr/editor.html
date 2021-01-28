@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="../css/themes.js"></script>
-    <script src="parser.js"></script>
-    <script src="editor.js"></script>
+    <script type="module" src="compiler.js"></script>
+    <script type="module" src="editor.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo&family=Roboto&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../fonts/consolas.css">
     <link rel="stylesheet" href="../css/algo.css">
@@ -61,17 +61,17 @@
     <div class="separator"></div>
     
     <div class="mobile btns-tools">
-        <button class="parsebtn-mobile" onclick="Parse()">
+        <button class="parsebtn-mobile compile">
             Compiler  
             <br>
             <i class="fa fa-cog"></i>
         </button>
-        <button class="execbtn-mobile" onclick="exec()">
+        <button class="execbtn-mobile exec">
             Exécuter
             <br>
             <i class="fa fa-play"></i>
         </button>
-        <button class="uploadbtn-mobile">
+        <button class="uploadbtn-mobile upload">
             <div>
                 Importer
                 <br>
@@ -79,7 +79,7 @@
             </div>
             <input type="file" class="uplbtn" style="cursor: pointer; z-index: 100; position: relative; width: 70px; height: 50px; opacity: 0;">
         </button>
-        <button class="downloadbtn-mobile" onclick="downloadFile()">
+        <button class="downloadbtn-mobile download">
             Télécharger
             <br>
             <i class="fa fa-download"></i>
@@ -96,25 +96,24 @@
                 <div class="code">
 
                 </div>
-                <textarea id="txtcode" spellcheck="false" class="codesnippet code-font" placeholder="Code...">
-                    
+                <textarea id="txtcode" spellcheck="false" class="codesnippet code-font" placeholder="Code...">  
                 </textarea>
             </div>
         </div>
         <div class="tools-pc">
-            <button class="parsebtn" onclick="Parse()">
+            <button class="parsebtn compile">
                 Compiler
                 <br>
                 <i class="fa fa-cog"></i>
             </button>
             <br><br>
-            <button class="execbtn" onclick="exec()">
+            <button class="execbtn exec">
                 Exécuter
                 <br>
                 <i class="fa fa-play"></i>
             </button>
             <br><br>
-            <button class="uploadbtn">
+            <button class="uploadbtn upload">
                 <div>
                     Importer
                     <br>
@@ -123,7 +122,7 @@
                 <input type="file" class="uplbtn" style="cursor: pointer; z-index: 90; position: relative; width: 70px; height: 50px; opacity: 0;">
             </button>
             <br><br>
-            <button class="downloadbtn" onclick="downloadFile()">
+            <button class="downloadbtn download">
                 Télécharger
                 <br>
                 <i class="fa fa-download"></i>
@@ -133,7 +132,7 @@
     
     <div class="consoles" id="build">
         <div class="modal-body">
-            <div class="quit"><button onclick="closeConsoles()"><i class="fa fa-close"></i></button></div>
+            <div class="quit"><button><i class="fa fa-close"></i></button></div>
             <div class="log">
             </div>
         </div>
@@ -141,7 +140,7 @@
 
     <div class="consoles" id="exec">
         <div class="modal-body">
-            <div class="quit"><button onclick="closeConsoles()"><i class="fa fa-close"></i></button></div>
+            <div class="quit"><button><i class="fa fa-close"></i></button></div>
             <div class="log">
             </div>
         </div>

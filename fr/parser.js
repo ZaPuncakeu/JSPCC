@@ -1036,12 +1036,201 @@ function addToken(m_token)
 
 function program_root()
 {   
+    fonctions()
     program_main();
     declaration(full_program);
     console.log(token);
     body();
-
+    console.log(full_program)
     console.log(functions_table);
+}
+
+function fonctions()
+{
+    let curr_time = getTime();
+    token = getNextToken();
+    while(checkToken("function") || checkToken("procedure"))
+    {
+        if(isStuck(curr_time, missingKeyWord, "var/const/procédure/fonction"))
+        {
+            return;
+        }
+
+        if(checkToken("function"))
+        {
+            let tmp = current_function;
+            program.col+=token.value.length;
+            token = getNextToken();
+            if(checkToken("id"))
+            {
+                program.col+=token.value.length;
+                functions_table[token.value] = {
+                    local_data: {
+                        consts: {},
+                        vars: {},
+                        params: {}
+                    },
+                    instructions: [],
+                };
+
+                current_function = token.value;
+
+                token = getNextToken();
+                if(checkToken("("))
+                {
+                    token = getNextToken();
+                    params(functions_table[current_function].instructions);
+                    if(checkToken("type"))
+                    {
+                        token = getNextToken();
+                        if(checkToken(";"))
+                        {
+                            declaration(functions_table[current_function].instructions);
+                            body(functions_table[current_function].instructions);
+                        }
+                        else 
+                        {
+                            missingSemiColumn();
+                        }
+                    }
+                    else 
+                    {
+                        missingType();
+                    }
+                }
+                else 
+                {
+                    expectedToken("(")
+                }
+
+                current_function = tmp;
+            }
+            else 
+            {
+                missingId("Fonction");
+            }
+        }
+    }
+}
+
+function params(instructions)
+{
+    let curr_time = getTime();
+    while(!checkToken(")"))
+    {
+        if(isStuck(curr_time, unexpectedToken, token.value))
+        {
+            return;
+        }
+
+        if(checkToken("mode"))
+        {
+            let mode = token.value;
+            token = getNextToken();
+            if(checkToken("/"))
+            {
+                token = getNextToken();
+                param_dec(mode, instructions);
+            }
+            else 
+            {
+                expectedToken("/");
+            }
+        }
+    }
+    token = getNextToken();
+}
+
+function param_dec(mode, instruction)
+{
+    let inst_List = [];
+    let curr_time = getTime();
+    while(!checkToken(":"))
+    {
+        if(isStuck(curr_time, missingSemiColumn, null))
+        {
+            return;
+        }
+
+        if(checkToken("id"))
+        {
+            program.col+=token.value.length;
+            let new_inst = {
+                function: current_function,
+                instruction: "param_dec",
+                id: token.value,
+                mode: mode,
+                type: null,
+                shape: ""
+            };
+            
+            token = getNextToken();
+            if(checkToken("["))
+            {
+                program.col+=token.value.length;
+                let curr_time3 = getTime();
+
+                token = getNextToken();
+                while(!checkToken("]"))
+                {
+                    if(isStuck(curr_time3, expectedToken, "]"))
+                    {
+                        return;
+                    }
+
+                    if(checkToken("value"))
+                    {
+                        program.col+=token.value.length;
+                        new_inst.shape += token.value;
+                        token = getNextToken();
+                    }
+                    else 
+                    {
+                        unexpectedToken(token.value);
+                    }
+                    
+                    if(checkToken(","))
+                    {
+                        program.col+=token.value.length;
+                        new_inst.shape += "*";
+                        token = getNextToken();
+                    }
+                }
+
+                token = getNextToken();
+            }
+
+            inst_List.push(new_inst);
+        }
+
+        if(checkToken(","))
+        {
+            program.col+=token.value.length;
+            token = getNextToken();
+            continue;
+        }
+    }
+
+    if(checkToken(":"))
+    {
+        program.col+=token.value.length;
+        token = getNextToken();
+        if(checkToken("type"))
+        {
+            program.col+=token.value.length;
+            for(let i = 0; i < inst_List.length; i++)
+            {
+                inst_List[i].type = token.value;
+            }
+            token = getNextToken();
+            console.log(inst_List);
+            addInstructions(inst_List, instruction);
+        }
+        else 
+        {
+            missingType();
+        }
+    }
 }
 
 function program_main()
@@ -1157,175 +1346,6 @@ function declaration(prg)
             {
                 unexpectedToken(token.value);
             }
-        }
-    }
-
-    /*while(checkToken("function") || checkToken("procedure"))
-    {
-        if(isStuck(curr_time, missingKeyWord, "var/const/procédure/fonction"))
-        {
-            return;
-        }
-
-        if(checkToken("function"))
-        {
-            let tmp = current_function;
-            program.col+=token.value.length;
-            token = getNextToken();
-            if(checkToken("id"))
-            {
-                program.col+=token.value.length;
-                functions_table[token.value] = {
-                    local_data: {
-                        consts: {},
-                        vars: {},
-                        params: {}
-                    },
-                    instructions: [],
-                };
-
-                current_function = token.value;
-
-                token = getNextToken();
-                if(checkToken("("))
-                {
-                    token = getNextToken();
-                    params(functions_table[current_function].instructions);
-                }
-                else 
-                {
-                    expectedToken("(")
-                }
-            }
-            else 
-            {
-                missingId("Fonction");
-            }
-        }
-    }*/
-}
-
-function params(instructions)
-{
-    let curr_time = getTime();
-    while(!checkToken(")"))
-    {
-        if(isStuck(curr_time, unexpectedToken, token.value))
-        {
-            return;
-        }
-
-        if(checkToken("mode"))
-        {
-            let mode = token.value;
-            token = getNextToken();
-            if(checkToken("/"))
-            {
-                token = getNextToken();
-                param_dec(mode, instructions);
-            }
-            else 
-            {
-                expectedToken("/");
-            }
-
-            if(checkToken(";"))
-            {
-                token = getNextToken();
-            }
-        }
-    }
-    token = getNextToken();
-}
-
-function param_dec(mode, instruction)
-{
-    let inst_List = [];
-    let curr_time = getTime();
-    while(!checkToken(":"))
-    {
-        if(isStuck(curr_time, missingSemiColumn, null))
-        {
-            return;
-        }
-
-        if(checkToken("id"))
-        {
-            program.col+=token.value.length;
-            let new_inst = {
-                function: current_function,
-                instruction: "param_dec",
-                id: token.value,
-                mode: mode,
-                type: null,
-                shape: ""
-            };
-            
-            token = getNextToken();
-            if(checkToken("["))
-            {
-                program.col+=token.value.length;
-                let curr_time3 = getTime();
-
-                token = getNextToken();
-                while(!checkToken("]"))
-                {
-                    if(isStuck(curr_time3, expectedToken, "]"))
-                    {
-                        return;
-                    }
-
-                    if(checkToken("value"))
-                    {
-                        program.col+=token.value.length;
-                        new_inst.shape += token.value;
-                        token = getNextToken();
-                    }
-                    else 
-                    {
-                        unexpectedToken(token.value);
-                    }
-                    
-                    if(checkToken(","))
-                    {
-                        program.col+=token.value.length;
-                        new_inst.shape += "*";
-                        token = getNextToken();
-                    }
-                }
-
-                token = getNextToken();
-            }
-
-            inst_List.push(new_inst);
-        }
-
-        if(checkToken(","))
-        {
-            program.col+=token.value.length;
-            token = getNextToken();
-            continue;
-        }
-    }
-
-    if(checkToken(":"))
-    {
-        program.col+=token.value.length;
-        token = getNextToken();
-        if(checkToken("type"))
-        {
-            program.col+=token.value.length;
-            for(let i = 0; i < inst_List.length; i++)
-            {
-                inst_List[i].type = token.value;
-            }
-            token = getNextToken();
-
-            addInstructions(inst_List, instruction);
-        }
-        else 
-        {
-            missingType();
         }
     }
 }
@@ -2867,3 +2887,14 @@ $(document).ready(function()
         }
     });
 })
+
+
+
+
+
+
+
+
+
+
+

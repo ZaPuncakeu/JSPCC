@@ -65,12 +65,11 @@ export const allocateMemory = (data) =>
                 
                 index = i;
 
-                memory.push(
-                {
+                memory[i] = {
                     type: data.type,
                     is_ptr: data.is_ptr,
                     data: null
-                });
+                };
 
                 break;
             }
@@ -99,12 +98,13 @@ export const insertVariable = (data) =>
         //USED ID
         return;
     }
-
+    
     stack[stack.length-1][data.id] = {
         type: data.type,
         is_ptr: data.is_ptr,
         dim: data.dim,
-        adr: allocateMemory(data)
+        adr: allocateMemory(data),
+        mode: (typeof(data.mode) != "undefined" ? data.mode : null)
     }
 }
 
@@ -135,19 +135,440 @@ export const insertFunction = (id, position) =>
     }
 }
 
-export const callFunction = (id) =>
+export const callFunction = (datas, tree) =>
 {
-    if(typeof(function_table[id]) == "undefined")
+    if(typeof(function_table[datas.val]) == "undefined")
     {
         //UNDECLARED FUN
         return;
     }
 
+    
+    const pos = function_table[datas.val].pos;
+
+    if(datas.params == null)
+    {
+        datas.params = [];
+    }
+
+    if(tree[pos].params == null)
+    {
+        tree[pos].params = [];
+    }
+
+    tree[pos].return_val = datas.target;
+    if(datas.params.length != tree[pos].params.length)
+    {
+        //MISSING PARAMS
+        return;
+    }
+    
     stack.push(
     {
-        id: id,
-        next_instruction: function_table[id].pos
+        id: datas.val,
+        next_instruction: pos
     });
+
+    getFct()["type"] = tree[pos].type;
+    getFct()["return_val"] = datas.target;
+    for(let i = 0; i < datas.params.length; i++)
+    {
+        switch(tree[pos].params[i].mode.toLowerCase())
+        {
+            case "e":{
+                insertVariable(tree[pos].params[i])
+                if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
+                {
+                    //ERROR TYPE CONFLICT
+                    return;
+                }
+                if(datas.params[i].val[0] != "$")
+                {
+                    if(tree[pos].params[i].dim.length > 0)
+                    {
+                        if(datas.params[i].index.length > 0)
+                        {
+                            //ERROR DIM
+                            return;
+                        }
+
+                        if(tree[pos].params[i].dim.length != stack[stack.length-2][datas.params[i].val].dim.length)
+                        {
+                            ///DIM MISMATCH
+                            return; 
+                        }
+
+                        for(let j = 0; j < tree[pos].params[i].dim.length; j++)
+                        {
+                            if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
+                            {
+                                //ERR DIM MISMATCH
+                                return false;
+                            }
+                        }
+
+                        let total = 1;
+                        for(let j = 0; j < tree[pos].params[i].dim.length; j++)
+                        {
+                            if(tree[pos].params[i].dim[j].type != "int")
+                            {
+                                //WRONG TYPE 
+                                return;
+                            }
+                            total *= parseInt(tree[pos].params[i].dim[j].value);
+                        }
+                        
+                        for(let j = 0; j < total; j++)
+                        {
+                            memory[stack[stack.length-1][tree[pos].params[i].id].adr + j].data = memory[stack[stack.length-2][datas.params[i].val].adr + j].data;
+                        }
+                    }
+                    else 
+                    {
+                        if(datas.params[i].index.length > 0)
+                        {
+                            let indexes = [];
+                            let dim = [];
+                            
+                            for(let j = 0; j < datas.params[i].index.length; j++)
+                            {
+                                if(registers[datas.params[i].index[j]].type != "int")
+                                {
+                                    //TYPE CONFLICT
+                                    return;
+                                }
+
+                                indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                                dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
+                            }
+
+                            let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
+                            memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[index].data;
+                        }
+                        else 
+                        {
+                            memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[stack[stack.length-2][datas.params[i].val].adr].data;
+                        }
+                    }
+                }
+                else 
+                {
+                    if(tree[pos].params[i].dim > 0)
+                    {
+                        //ERROR DIM MISMATCH 
+                        return;
+                    }
+                    
+                    memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = registers[datas.params[i].val].data;
+                }
+                break;
+            }
+            case "s":{
+                insertVariable(tree[pos].params[i]);
+                if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
+                {
+                    //ERROR TYPE CONFLICT
+                    return;
+                }
+
+                if(datas.params[i].val[0] != "$")
+                {
+                    if(tree[pos].params[i].dim.length > 0)
+                    {
+                        if(datas.params[i].index.length > 0)
+                        {
+                            //ERROR DIM
+                            return;
+                        }
+
+                        if(tree[pos].params[i].dim.length != stack[stack.length-2][datas.params[i].val].dim.length)
+                        {
+                            ///DIM MISMATCH
+                            return; 
+                        }
+
+                        stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                        for(let j = 0; j < tree[pos].params[i].dim.length; j++)
+                        {
+                            if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
+                            {
+                                //ERR DIM MISMATCH
+                                return false;
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        if(datas.params[i].index.length > 0)
+                        {
+                            let indexes = [];
+                            let dim = [];
+                            
+                            for(let j = 0; j < datas.params[i].index.length; j++)
+                            {
+                                if(registers[datas.params[i].index[j]].type != "int")
+                                {
+                                    //TYPE CONFLICT
+                                    return;
+                                }
+
+                                indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                                dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
+                            }
+
+                            let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
+                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = index;
+                        }
+                        else 
+                        {
+                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                        }
+                    }
+                }
+                break;
+            }
+            case "es":{
+                insertVariable(tree[pos].params[i]);
+                if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
+                {
+                    //ERROR TYPE CONFLICT
+                    return;
+                }
+
+                if(datas.params[i].val[0] != "$")
+                {
+                    if(tree[pos].params[i].dim.length > 0)
+                    {
+                        if(datas.params[i].index.length > 0)
+                        {
+                            //ERROR DIM
+                            return;
+                        }
+
+                        if(tree[pos].params[i].dim.length != stack[stack.length-2][datas.params[i].val].dim.length)
+                        {
+                            ///DIM MISMATCH
+                            return; 
+                        }
+
+                        for(let j = 0; j < tree[pos].params[i].dim.length; j++)
+                        {
+                            if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
+                            {
+                                //ERR DIM MISMATCH
+                                return false;
+                            }
+                        }
+
+                        stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                    }
+                    else 
+                    {
+                        if(datas.params[i].index.length > 0)
+                        {
+                            let indexes = [];
+                            let dim = [];
+                            
+                            for(let j = 0; j < datas.params[i].index.length; j++)
+                            {
+                                if(registers[datas.params[i].index[j]].type != "int")
+                                {
+                                    //TYPE CONFLICT
+                                    return;
+                                }
+
+                                indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                                dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
+                            }
+
+                            let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
+                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = index;
+                        }
+                        else 
+                        {
+                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                        }
+                    }
+                }
+
+                break;
+            }
+            case "ref":{
+                if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
+                {
+                    //ERROR TYPE CONFLICT
+                    return;
+                }
+
+                if(datas.params[i].val[0] != "$")
+                {
+                    if(datas.params[i].index.length > 0)
+                    {
+                        let indexes = [];
+                        let dim = [];
+                        
+                        for(let j = 0; j < datas.params[i].index.length; j++)
+                        {
+                            if(registers[datas.params[i].index[j]].type != "int")
+                            {
+                                //TYPE CONFLICT
+                                return;
+                            }
+
+                            indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                            dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
+                        }
+
+                        let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
+                        stack[stack.length-1][tree[pos].params[i].id] = {...stack[stack.length-2][datas.params[i].val]};
+                        stack[stack.length-1][tree[pos].params[i].id].adr = index;
+                        stack[stack.length-1][tree[pos].params[i].id].mode = "ref";
+                    }
+                    else 
+                    {
+                        stack[stack.length-1][tree[pos].params[i].id] = {...stack[stack.length-2][datas.params[i].val]};
+                        stack[stack.length-1][tree[pos].params[i].id].mode = "ref";
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+export const returnFunction = (data) => 
+{
+    if(typeof(getFct().type) == "undefined")
+    {
+        //PROCEDURE AND RETURN WITH VALUE
+        return;
+    }
+    
+    if(getFct().type != registers[data.target].type)
+    {
+        //TYPE CONFLICT
+        return;
+    }
+
+    registers[getFct().return_val] = {...registers[data.target]};
+    endFunction();
+}
+
+export const endFunction = () => 
+{
+    for(const key in stack[stack.length-1])
+    {
+        if(key != "id")
+        {
+            if(stack[stack.length-1][key].mode)
+            {
+                switch(getFct()[key].mode)
+                {
+                    case "e":
+                    {
+                        if(typeof(stack[stack.length-1][key].adr) != "undefined")
+                        {
+                            if(getFct()[key].dim.length > 0)
+                            {
+                                let total = 1;
+                                for(let j = 0; j < getFct()[key].dim.length; j++)
+                                {
+                                    total *= parseInt(getFct()[key].dim[j].value);
+                                }
+                                
+                                for(let j = 0; j < total; j++)
+                                {
+                                    memory[getFct()[key].adr + j] = null;
+                                }
+                            }
+                            else 
+                            {
+                                memory[stack[stack.length-1][key].adr] = null;
+                            }
+                        }
+                        break;
+                    }
+                    case "s":
+                    {
+                        if(typeof(stack[stack.length-1][key].adr) != "undefined")
+                        {
+                            if(getFct()[key].dim.length > 0)
+                            {
+                                let total = 1;
+                                for(let j = 0; j < getFct()[key].dim.length; j++)
+                                {
+                                    total *= parseInt(getFct()[key].dim[j].value);
+                                }
+                                
+                                for(let j = 0; j < total; j++)
+                                {
+                                    memory[getFct()[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                    memory[getFct()[key].adr + j] = null;
+                                }
+                            }
+                            else 
+                            {
+                                memory[getFct[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                memory[stack[stack.length-1][key].adr] = null;
+                            }
+                        }
+                        break;
+                    }
+                    case "es":
+                    {
+                        if(typeof(stack[stack.length-1][key].adr) != "undefined")
+                        {
+                            if(getFct()[key].dim.length > 0)
+                            {
+                                let total = 1;
+                                for(let j = 0; j < getFct()[key].dim.length; j++)
+                                {
+                                    total *= parseInt(getFct()[key].dim[j].value);
+                                }
+                                
+                                for(let j = 0; j < total; j++)
+                                {
+                                    memory[getFct()[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                    memory[getFct()[key].adr + j] = null;
+                                }
+                            }
+                            else 
+                            {
+                                memory[getFct[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                memory[stack[stack.length-1][key].adr] = null;
+                            }
+                        }
+                        break;
+                    } 
+                }
+            }
+            else 
+            {
+                if(typeof(stack[stack.length-1][key].adr) != "undefined")
+                {
+                    if(getFct()[key].dim.length > 0)
+                    {
+                        let total = 1;
+                        for(let j = 0; j < getFct()[key].dim.length; j++)
+                        {
+                            total *= parseInt(getFct()[key].dim[j].value);
+                        }
+                        
+                        for(let j = 0; j < total; j++)
+                        {
+                            memory[getFct()[key].adr + j] = null;
+                        }
+                    }
+                    else 
+                    {
+                        memory[stack[stack.length-1][key].adr] = null;
+                    }
+                }
+            }
+        }
+    }
+
+    stack.pop();
 }
 
 export const decFunction = (data) => 
@@ -207,14 +628,12 @@ export const saveVal = (data) =>
 {
     if(data.index.length == 0)
     {
-        console.log(data);
-        console.log(memory[stack[stack.length-1][data.target].adr]);
         if(memory[stack[stack.length-1][data.target].adr].type != registers[data.val].type)
         {
             //TYPE CONFLICT
             return;
         }
-
+        
         memory[stack[stack.length-1][data.target].adr] = registers[data.val];
     }
     else 

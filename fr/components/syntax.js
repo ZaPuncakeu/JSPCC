@@ -127,7 +127,8 @@ const function_header = () =>
         instr: "dec_fct",
         id: id,
         line: line,
-        col: col
+        col: col, 
+        params: null
     });
 
     current_function = id;
@@ -179,7 +180,9 @@ const function_header = () =>
 
 const params = () => 
 {
+    const index = program_tree.length - 1; 
     const time_mode = getTime();
+    let params = [];
     while(checkToken("mode"))
     {
         let mode = token.value;
@@ -199,20 +202,33 @@ const params = () =>
         const time = getTime();
         while(!checkToken(":"))
         {
+            let is_ptr = false;
             if(isStuck(time, Errors.unexpectedToken,token.value))
             {
                 return;
             }
-
+            
             token = getNextToken();
+            if(checkToken("*"))
+            {
+                is_ptr = true;
+                token = getNextToken();
+            }
+            else 
+            {
+                is_ptr = false;
+            }
+            
             if(!checkToken("id"))
             {
                 setError(Errors.unexpectedToken(token.value));
                 return;
             }
+            
             var_list.push({
                 id: token.value,
-                dim: dec_array()
+                dim: dec_array(),
+                is_ptr: is_ptr
             });
             
             if(!checkToken(":") && !checkToken(","))
@@ -230,12 +246,13 @@ const params = () =>
 
         var_list.forEach((vr) => 
         {
-            program_tree.push(
+            params.push(
             {
                 instr: "dec_param",
                 id: vr.id,
                 type: token.value,
                 fct: current_function,
+                is_ptr: vr.is_ptr,
                 mode: mode,
                 dim: vr.dim,
                 line: line,
@@ -254,6 +271,8 @@ const params = () =>
             }
         }
     }
+
+    program_tree[index].params = params;
 
 }
 
@@ -1130,21 +1149,10 @@ const functor = () =>
     if(checkToken("id"))
     {
         let val = token.value;
-        
         token = getNextToken();
         if(checkToken("("))
         {
-            program_tree.push(
-            {
-                instr: "fct_set",
-                params: null,
-                fct: current_function,
-                line: line,
-                col: col
-            });
-            
-            const setterIndex = program_tree.length - 1;
-
+            let params = [];
             token = getNextToken();
             let timefctcall = getTime();
             while(!checkToken(")"))
@@ -1153,18 +1161,53 @@ const functor = () =>
                 {
                     return;
                 }
-
-                expression();
-                program_tree.push(
+                
+                if(checkToken("id"))
                 {
-                    instr: "set_param",
-                    val: program_tree[program_tree.length - 1].target,
-                    index: set_index(),
-                    to: setterIndex,
-                    fct: current_function,
-                    line: line,
-                    col: col
-                });
+                    const tmp2 = current_token - 1;
+                    const id = token.value;
+                    token = getNextToken(); 
+                    const var_index = set_index();
+                    if(checkToken(",") || checkToken(")"))
+                    {
+                        params.push(
+                        {
+                            instr: "set_param",
+                            val: id,
+                            index: var_index,
+                            fct: current_function,
+                            line: line,
+                            col: col
+                        });
+
+                        if(checkToken(","))
+                        {
+                            token = getNextToken();
+                            if(checkToken(")"))
+                            {
+                                setError(Error.unexpectedToken(token.value));
+                                return;
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        current_token = tmp2;
+                        token = tk_list[tmp2];
+                        token = getNextToken();
+
+                        expression();
+                        params.push(
+                        {
+                            instr: "set_param",
+                            val: program_tree[program_tree.length - 1].target,
+                            index: set_index(),
+                            fct: current_function,
+                            line: line,
+                            col: col
+                        });
+                    }
+                }
 
                 if(checkToken(","))
                 {
@@ -1185,7 +1228,7 @@ const functor = () =>
                 index: set_index(),
                 target: "$"+(++interm_var),
                 fct: current_function,
-                params: setterIndex,
+                params: params,
                 line: line,
                 col: col
             });

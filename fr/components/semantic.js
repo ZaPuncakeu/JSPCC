@@ -13,7 +13,10 @@ export default async (main_index, program_tree) =>
 
     branchings();
     SYM.LOG();
-    await exec();
+    await exec().catch((err) => 
+    {
+        console.log("error at:"+SYM.getCurrentInstruction());
+    });
     
     return 0;
 }
@@ -174,15 +177,20 @@ const exec = async () =>
                 SYM.step(tree[SYM.getCurrentInstruction()]);
                 break;
             }
-            case "set_param":
-            {
-                
-                break;
-            }
             case "fct_call":
             {
-                SYM.callFunction(tree[SYM.getCurrentInstruction()].val);
-                return;
+                SYM.callFunction(tree[SYM.getCurrentInstruction()], tree);
+                break;
+            }
+            case "return":
+            {
+                SYM.returnFunction(tree[SYM.getCurrentInstruction()]);
+                break;
+            }
+            case "end_fct":
+            {
+                SYM.endFunction();
+                break;   
             }
         }
         

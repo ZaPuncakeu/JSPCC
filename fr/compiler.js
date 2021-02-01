@@ -42,6 +42,21 @@ $(document).ready(function()
     {
         semantics(mainf, ptree);
     })
+
+    $(".download").on('click', () => 
+    {
+        let text = $("#txtcode").val();
+        text = text.replace(/\n/g, "\r\n");
+        let blob = new Blob([text], { type: "text/plain"});
+        let anchor = document.createElement("a");
+        anchor.download = ptree[mainf].id+".jspcc";
+        anchor.href = window.URL.createObjectURL(blob);
+        anchor.target ="_blank";
+        anchor.style.display = "none";
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+    });
 })
 
 

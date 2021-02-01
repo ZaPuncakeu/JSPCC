@@ -15,7 +15,8 @@ export default async (main_index, program_tree) =>
     SYM.LOG();
     await exec().catch((err) => 
     {
-        console.log("error at:"+SYM.getCurrentInstruction());
+        console.log("error at: "+SYM.getCurrentInstruction());
+        console.log(err);
     });
     
     return 0;

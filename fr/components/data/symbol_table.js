@@ -156,7 +156,7 @@ export const callFunction = (datas, tree) =>
         tree[pos].params = [];
     }
 
-    tree[pos].return_val = datas.target;
+    tree[pos].$return_val = datas.target;
     if(datas.params.length != tree[pos].params.length)
     {
         //MISSING PARAMS
@@ -169,8 +169,8 @@ export const callFunction = (datas, tree) =>
         next_instruction: pos
     });
 
-    getFct()["type"] = tree[pos].type;
-    getFct()["return_val"] = datas.target;
+    getFct()["$type"] = tree[pos].type;
+    getFct()["$return_val"] = datas.target;
     for(let i = 0; i < datas.params.length; i++)
     {
         switch(tree[pos].params[i].mode.toLowerCase())
@@ -287,7 +287,7 @@ export const callFunction = (datas, tree) =>
                             return; 
                         }
 
-                        stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                        stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
                         for(let j = 0; j < tree[pos].params[i].dim.length; j++)
                         {
                             if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
@@ -317,11 +317,11 @@ export const callFunction = (datas, tree) =>
                             }
 
                             let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
-                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = index;
+                            stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = index;
                         }
                         else 
                         {
-                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                            stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
                         }
                     }
                 }
@@ -360,7 +360,7 @@ export const callFunction = (datas, tree) =>
                             }
                         }
 
-                        stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                        stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
                     }
                     else 
                     {
@@ -382,11 +382,11 @@ export const callFunction = (datas, tree) =>
                             }
 
                             let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
-                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = index;
+                            stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = index;
                         }
                         else 
                         {
-                            stack[stack.length-1][tree[pos].params[i].id]["adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
+                            stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
                         }
                     }
                 }
@@ -438,19 +438,19 @@ export const callFunction = (datas, tree) =>
 
 export const returnFunction = (data) => 
 {
-    if(typeof(getFct().type) == "undefined")
+    if(typeof(getFct()["$type"]) == "undefined")
     {
         //PROCEDURE AND RETURN WITH VALUE
         return;
     }
     
-    if(getFct().type != registers[data.target].type)
+    if(getFct()["$type"] != registers[data.target].type)
     {
         //TYPE CONFLICT
         return;
     }
 
-    registers[getFct().return_val] = {...registers[data.target]};
+    registers[getFct().$return_val] = {...registers[data.target]};
     endFunction();
 }
 
@@ -458,9 +458,9 @@ export const endFunction = () =>
 {
     for(const key in stack[stack.length-1])
     {
-        if(key != "id")
+        if(key[0] != "$")
         {
-            if(stack[stack.length-1][key].mode)
+            if(typeof(stack[stack.length-1][key].mode) != "undefined")
             {
                 switch(getFct()[key].mode)
                 {
@@ -502,13 +502,13 @@ export const endFunction = () =>
                                 
                                 for(let j = 0; j < total; j++)
                                 {
-                                    memory[getFct()[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                    memory[getFct()[key].$adr_out + j] = memory[getFct()[key].adr + j];
                                     memory[getFct()[key].adr + j] = null;
                                 }
                             }
                             else 
                             {
-                                memory[getFct[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                memory[getFct[key].$adr_out + j] = memory[getFct()[key].adr + j];
                                 memory[stack[stack.length-1][key].adr] = null;
                             }
                         }
@@ -528,13 +528,13 @@ export const endFunction = () =>
                                 
                                 for(let j = 0; j < total; j++)
                                 {
-                                    memory[getFct()[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                    memory[getFct()[key].$adr_out + j] = memory[getFct()[key].adr + j];
                                     memory[getFct()[key].adr + j] = null;
                                 }
                             }
                             else 
                             {
-                                memory[getFct[key].adr_out + j] = memory[getFct()[key].adr + j];
+                                memory[getFct[key].$adr_out + j] = memory[getFct()[key].adr + j];
                                 memory[stack[stack.length-1][key].adr] = null;
                             }
                         }

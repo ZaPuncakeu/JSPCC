@@ -9,7 +9,6 @@ $(document).ready(function()
         {
             $("#txtcode").val(content);
             updateEditor();
-            compile();
             $('input[type="file"]').val(null);
         });
     });
@@ -66,6 +65,7 @@ $(document).ready(function()
         $(".line_num").html(nums);
 
         $(".code").empty().html(getKeyWords(code)); 
+        $(".code").append("<br>"); 
     }
 
     (function() 
@@ -82,11 +82,6 @@ $(document).ready(function()
         });
     })();
 });
-
-function KeyWords(kw)
-{
-    return "<span class='kw'>"+kw+"</span>";
-}
 
 function getKeyWords(code)
 {

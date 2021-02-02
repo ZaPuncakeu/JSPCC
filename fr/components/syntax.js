@@ -1701,7 +1701,7 @@ const getTime = () =>
     return new Date();
 }
 
-function setError(message)
+const setError = (message) =>
 {
     error_list.push({
         line: line,

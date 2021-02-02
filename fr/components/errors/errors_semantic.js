@@ -1,29 +1,74 @@
-export function wrongType(type_expected, type_used)
+export const wrongType = (type_expected, type_used) =>
 {
-    setError("Utilisation d'un type '"+type_used+"', type '"+type_expected+"' attendu.");
+    return("Utilisation d'un type '"+type_used+"', type '"+type_expected+"' attendu.");
 }
 
-export function undeclaredVar(id)
+export const undeclaredVar = (id) =>
 {
-    setError("Utilisation d'une variable non déclarée '"+id+"'.");
+    return("Utilisation d'une variable/constante non déclarée: "+id);
 }
 
-export function constAffectation(id)
+export const dimMismatch = () => 
 {
-    setError("Opération interdite. Affectation d'une valeur à une constante '"+id+"'.");
+    return("Dimentions incompatibles.");
 }
 
-export function constRead(id)
+export const undeclaredFun = (id) =>
 {
-    setError("Opération interdite. Lecture d'une valeur dans une constante '"+id+"'.");
+    return("Appelle d'une fonction non déclarée: "+id);
 }
 
-export function conflictingTypes(t1, t2)
+export const constAffectation = (id) =>
 {
-    setError("Opération entre 2 types incompatibles ("+t1+", "+t2+"). Conversion implicite impossible.");
+    return("Opération interdite. Affectation d'une valeur à une constante: "+id);
 }
 
-export function capacityOverflow()
+export const divByZero = () =>
 {
-    setError("Dépacement de capacité.");
+    return("Division par 0");
+}
+
+export const constRead = (id) =>
+{
+    return("Opération interdite. Lecture d'une valeur dans une constante '"+id+"'.");
+}
+
+export const conflictingTypes = (t1, t2) =>
+{
+    return("Opération entre 2 types incompatibles ("+t1+", "+t2+"). Conversion implicite impossible.");
+}
+
+export const capacityOverflow = () =>
+{
+    return("Dépacement de capacité.");
+}
+
+export const usedId = (id) => 
+{
+    return("Identifiant déjà utilisé: "+id);
+}
+
+export const tooMuchParams = () => 
+{
+    return("Des paramètres sont en trop lors de l'appelle.")
+}
+
+export const tooFewParams = () => 
+{
+    return("Des paramètres manquant lors de l'appelle.")
+}
+
+export const outPutOnConst = () => 
+{
+    return("Utilisation d'un paramètre 'Sortie' sur une constante est interdit.");
+}
+
+export const outPutOnExpression = (type) => 
+{
+    return ("Un paramètre '"+type+"' doit recevoir en argument une variable et non une expression.");
+}
+
+export const returnOnProcedure = () => 
+{
+    return("Une procédure ne peut pas retourner de valeur.");
 }

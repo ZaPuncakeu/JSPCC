@@ -2,6 +2,7 @@ import * as SYM from './data/symbol_table.js'
 
 let tree;
 let main;
+
 export default async (main_index, program_tree) => 
 {
     tree = program_tree;
@@ -28,7 +29,7 @@ const branchings = () =>
     {
         if(tree[i].instr == "dec_fct")
         {
-            SYM.insertFunction(tree[i].id, i);
+            SYM.insertFunction(tree[i].id, i, tree[i]);
             continue;
         }
     }
@@ -44,6 +45,11 @@ const exec = async () =>
         switch(tree[SYM.getCurrentInstruction()].instr)
         {
             case "dec_var":
+            {
+                SYM.insertVariable(tree[SYM.getCurrentInstruction()]);
+                break;
+            }
+            case "dec_const":
             {
                 SYM.insertVariable(tree[SYM.getCurrentInstruction()]);
                 break;
@@ -133,7 +139,7 @@ const exec = async () =>
                 SYM.dif(tree[SYM.getCurrentInstruction()])
                 break;
             }
-            case "==": 
+            case "=": 
             {
                 SYM.eq(tree[SYM.getCurrentInstruction()])
                 break;

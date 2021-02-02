@@ -1,3 +1,5 @@
+import * as Errors from '../errors/errors_semantic.js';
+
 let memory;
 let stack;
 let registers;
@@ -8,6 +10,8 @@ let current_instruction;
 let next_instruction;
 
 let current_input;
+
+let error_list;
 
 export const init = (main_index) => 
 {
@@ -20,20 +24,41 @@ export const init = (main_index) =>
     function_table = {};
     current_instruction = main_index;
     next_instruction = main_index+1;
+    
+    error_list = [];
 }
 
 export const allocateMemory = (data) => 
 {
     let index;
 
-    if(data.dim.length > 0)
+    if(data.instr != "dec_const" && data.dim.length > 0)
     {
         let total = 1;
         for(let i = 0; i < data.dim.length; i++)
         {
             if(data.dim[i].type != "int")
             {
-                //WRONG TYPE 
+                let used_type;
+                switch(data.dim[i].type)
+                {
+                    case "float":
+                    {
+                        used_type = "réel";
+                        break;
+                    }
+                    case "char":
+                    {
+                        used_type = "charactère";
+                        break
+                    }
+                    case "bool":
+                    {
+                        used_type = "booléen";
+                        break
+                    }
+                }
+                setError(Errors.wrongType("entier",used_type), data.line, data.col)
                 return;
             }
             total *= parseInt(data.dim[i].value);
@@ -95,16 +120,22 @@ export const insertVariable = (data) =>
 {
     if(typeof(stack[stack.length-1][data.id]) != "undefined")
     {
-        //USED ID
+        setError(Errors.usedId(data.id), data.line, data.col);
         return;
     }
     
     stack[stack.length-1][data.id] = {
         type: data.type,
         is_ptr: data.is_ptr,
+        is_const: typeof(data.is_const) != "undefined",
         dim: data.dim,
         adr: allocateMemory(data),
         mode: (typeof(data.mode) != "undefined" ? data.mode : null)
+    }
+
+    if(typeof(data.is_const) != "undefined")
+    {
+        memory[stack[stack.length-1][data.id].adr] = data.val;
     }
 }
 
@@ -122,11 +153,11 @@ export const setNextInstruction = (instruction) =>
     stack[stack.length-1].next_instruction = instruction
 }
 
-export const insertFunction = (id, position) => 
+export const insertFunction = (id, position, data) => 
 {
     if(typeof(function_table[id]) != "undefined")
     {
-        //ERROR: ID USED BY 
+        setError(Errors.usedId(id), data.line, data.col);
         return;
     }
     
@@ -139,11 +170,10 @@ export const callFunction = (datas, tree) =>
 {
     if(typeof(function_table[datas.val]) == "undefined")
     {
-        //UNDECLARED FUN
+        setError(Errors.undeclaredFun(datas.val), datas.line, datas.col);
         return;
     }
 
-    
     const pos = function_table[datas.val].pos;
 
     if(datas.params == null)
@@ -159,7 +189,14 @@ export const callFunction = (datas, tree) =>
     tree[pos].$return_val = datas.target;
     if(datas.params.length != tree[pos].params.length)
     {
-        //MISSING PARAMS
+        if(datas.params.length > tree[pos].params.length)
+        {
+            setError(Errors.tooMuchParams(), datas.line, datas.col);
+        }
+        else 
+        {
+            setError(Errors.tooFewParams(), datas.line, datas.col);
+        }
         return;
     }
     
@@ -177,24 +214,27 @@ export const callFunction = (datas, tree) =>
         {
             case "e":{
                 insertVariable(tree[pos].params[i])
-                if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
-                {
-                    //ERROR TYPE CONFLICT
-                    return;
-                }
                 if(datas.params[i].val[0] != "$")
                 {
+                    if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
+                    {
+                        if(typeConflict(tree[pos].params[i].type, stack[stack.length-2][datas.params[i].val].type,datas.params[i]))
+                        {
+                            return;
+                        }
+                    }
+
                     if(tree[pos].params[i].dim.length > 0)
                     {
                         if(datas.params[i].index.length > 0)
                         {
-                            //ERROR DIM
+                            setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                             return;
                         }
 
                         if(tree[pos].params[i].dim.length != stack[stack.length-2][datas.params[i].val].dim.length)
                         {
-                            ///DIM MISMATCH
+                            setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col)
                             return; 
                         }
 
@@ -202,7 +242,7 @@ export const callFunction = (datas, tree) =>
                         {
                             if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
                             {
-                                //ERR DIM MISMATCH
+                                setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                                 return false;
                             }
                         }
@@ -212,7 +252,26 @@ export const callFunction = (datas, tree) =>
                         {
                             if(tree[pos].params[i].dim[j].type != "int")
                             {
-                                //WRONG TYPE 
+                                let used_type;
+                                switch(datas.params[i].dim[j].type)
+                                {
+                                    case "float":
+                                    {
+                                        used_type = "réel";
+                                        break;
+                                    }
+                                    case "char":
+                                    {
+                                        used_type = "charactère";
+                                        break
+                                    }
+                                    case "bool":
+                                    {
+                                        used_type = "booléen";
+                                        break
+                                    }
+                                }
+                                setError(Errors.wrongType("entier",used_type), datas.params[i].line, datas.params[i].col);
                                 return;
                             }
                             total *= parseInt(tree[pos].params[i].dim[j].value);
@@ -220,7 +279,15 @@ export const callFunction = (datas, tree) =>
                         
                         for(let j = 0; j < total; j++)
                         {
-                            memory[stack[stack.length-1][tree[pos].params[i].id].adr + j].data = memory[stack[stack.length-2][datas.params[i].val].adr + j].data;
+                            if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2][datas.params[i].val].type == "float")
+                            {
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr + j].data = parseInt(memory[stack[stack.length-2][datas.params[i].val].adr + j].data);
+                            }
+                            else 
+                            {
+                                //OTHERS
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr + j].data = memory[stack[stack.length-2][datas.params[i].val].adr + j].data;
+                            }
                         }
                     }
                     else 
@@ -234,7 +301,26 @@ export const callFunction = (datas, tree) =>
                             {
                                 if(registers[datas.params[i].index[j]].type != "int")
                                 {
-                                    //TYPE CONFLICT
+                                    let used_type;
+                                    switch(registers[datas.params[i].index[j]].type)
+                                    {
+                                        case "float":
+                                        {
+                                            used_type = "réel";
+                                            break;
+                                        }
+                                        case "char":
+                                        {
+                                            used_type = "charactère";
+                                            break
+                                        }
+                                        case "bool":
+                                        {
+                                            used_type = "booléen";
+                                            break
+                                        }
+                                    }
+                                    setError(Errors.wrongType("entier",used_type), datas.params[i].line, datas.params[i].col)
                                     return;
                                 }
 
@@ -243,32 +329,79 @@ export const callFunction = (datas, tree) =>
                             }
 
                             let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
-                            memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[index].data;
+                            if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2][datas.params[i].val].type == "float")
+                            {
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(memory[index].data);
+                            }
+                            else 
+                            {
+                                //OTHERS
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[index].data;
+                            }
                         }
                         else 
                         {
-                            memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[stack[stack.length-2][datas.params[i].val].adr].data;
+                            if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2][datas.params[i].val].type == "float")
+                            {
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(memory[stack[stack.length-2][datas.params[i].val].adr].data);
+                            }
+                            else 
+                            {
+                                //OTHERS
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[stack[stack.length-2][datas.params[i].val].adr].data;
+                            }
                         }
                     }
                 }
                 else 
                 {
+                    if(tree[pos].params[i].type != registers[datas.params[i].val].type)
+                    {
+                        if(typeConflict(tree[pos].params[i].type, registers[datas.params[i].val].type,datas.params[i]))
+                        {
+                            return;
+                        }
+                    }
+
                     if(tree[pos].params[i].dim > 0)
                     {
-                        //ERROR DIM MISMATCH 
+                        setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                         return;
                     }
-                    
-                    memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = registers[datas.params[i].val].data;
+
+                    if(getFct()[tree[pos].params[i].id].type != registers[datas.params[i].val].type)
+                    {
+                        if(typeConflict(getFct()[tree[pos].params[i].id].type, registers[datas.params[i].val].type, datas.params[i]))
+                        {
+                            return;
+                        }
+                    }
+
+                    if(getFct()[tree[pos].params[i].id].type == "int" && registers[datas.params[i].val].type == "float")
+                    {
+                        memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(registers[datas.params[i].val].data);
+                    }
+                    else 
+                    {
+                        //OTHERS
+                        memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(registers[datas.params[i].val].data);
+                    }
                 }
                 break;
             }
             case "s":{
+                if(stack[stack.length-2][datas.params[i].val].is_const)
+                {
+                    setError(Errors.outPutOnConst(), datas.params[i].line, datas.params[i].col);
+                    return
+                }
                 insertVariable(tree[pos].params[i]);
                 if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
                 {
-                    //ERROR TYPE CONFLICT
-                    return;
+                    if(typeConflict(tree[pos].params[i].type, stack[stack.length-2][datas.params[i].val].type,datas.params[i]))
+                    {
+                        return;
+                    }
                 }
 
                 if(datas.params[i].val[0] != "$")
@@ -277,13 +410,13 @@ export const callFunction = (datas, tree) =>
                     {
                         if(datas.params[i].index.length > 0)
                         {
-                            //ERROR DIM
+                            setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                             return;
                         }
 
                         if(tree[pos].params[i].dim.length != stack[stack.length-2][datas.params[i].val].dim.length)
                         {
-                            ///DIM MISMATCH
+                            setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                             return; 
                         }
 
@@ -292,7 +425,7 @@ export const callFunction = (datas, tree) =>
                         {
                             if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
                             {
-                                //ERR DIM MISMATCH
+                                setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col)
                                 return false;
                             }
                         }
@@ -308,7 +441,26 @@ export const callFunction = (datas, tree) =>
                             {
                                 if(registers[datas.params[i].index[j]].type != "int")
                                 {
-                                    //TYPE CONFLICT
+                                    let used_type;
+                                    switch(registers[datas.params[i].index[j]].type)
+                                    {
+                                        case "float":
+                                        {
+                                            used_type = "réel";
+                                            break;
+                                        }
+                                        case "char":
+                                        {
+                                            used_type = "charactère";
+                                            break
+                                        }
+                                        case "bool":
+                                        {
+                                            used_type = "booléen";
+                                            break
+                                        }
+                                    }
+                                    setError(Errors.wrongType("entier",used_type), datas.params[i].line, datas.params[i].col)
                                     return;
                                 }
 
@@ -324,15 +476,22 @@ export const callFunction = (datas, tree) =>
                             stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
                         }
                     }
+                }
+                else 
+                {
+                    setError(Errors.outPutOnExpression("Sortie"), datas.params[i].line, datas.params[i].col);
+                    return;
                 }
                 break;
             }
             case "es":{
-                insertVariable(tree[pos].params[i]);
+                insertVariable(tree[pos].params[i])
                 if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
                 {
-                    //ERROR TYPE CONFLICT
-                    return;
+                    if(typeConflict(tree[pos].params[i].type, stack[stack.length-2][datas.params[i].val].type,datas.params[i]))
+                    {
+                        return;
+                    }
                 }
 
                 if(datas.params[i].val[0] != "$")
@@ -341,13 +500,13 @@ export const callFunction = (datas, tree) =>
                     {
                         if(datas.params[i].index.length > 0)
                         {
-                            //ERROR DIM
+                            setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                             return;
                         }
 
                         if(tree[pos].params[i].dim.length != stack[stack.length-2][datas.params[i].val].dim.length)
                         {
-                            ///DIM MISMATCH
+                            setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col)
                             return; 
                         }
 
@@ -355,8 +514,51 @@ export const callFunction = (datas, tree) =>
                         {
                             if(tree[pos].params[i].dim[j].value != stack[stack.length-2][datas.params[i].val].dim[j].value)
                             {
-                                //ERR DIM MISMATCH
+                                setError(Errors.dimMismatch(), datas.params[i].line, datas.params[i].col);
                                 return false;
+                            }
+                        }
+
+                        let total = 1;
+                        for(let j = 0; j < tree[pos].params[i].dim.length; j++)
+                        {
+                            if(tree[pos].params[i].dim[j].type != "int")
+                            {
+                                let used_type;
+                                switch(datas.params[i].dim[j].type)
+                                {
+                                    case "float":
+                                    {
+                                        used_type = "réel";
+                                        break;
+                                    }
+                                    case "char":
+                                    {
+                                        used_type = "charactère";
+                                        break
+                                    }
+                                    case "bool":
+                                    {
+                                        used_type = "booléen";
+                                        break
+                                    }
+                                }
+                                setError(Errors.wrongType("entier",used_type), datas.params[i].line, datas.params[i].col);
+                                return;
+                            }
+                            total *= parseInt(tree[pos].params[i].dim[j].value);
+                        }
+                        
+                        for(let j = 0; j < total; j++)
+                        {
+                            if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2][datas.params[i].val].type == "float")
+                            {
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr + j].data = parseInt(memory[stack[stack.length-2][datas.params[i].val].adr + j].data);
+                            }
+                            else 
+                            {
+                                //OTHERS
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr + j].data = memory[stack[stack.length-2][datas.params[i].val].adr + j].data;
                             }
                         }
 
@@ -373,7 +575,26 @@ export const callFunction = (datas, tree) =>
                             {
                                 if(registers[datas.params[i].index[j]].type != "int")
                                 {
-                                    //TYPE CONFLICT
+                                    let used_type;
+                                    switch(registers[datas.params[i].index[j]].type)
+                                    {
+                                        case "float":
+                                        {
+                                            used_type = "réel";
+                                            break;
+                                        }
+                                        case "char":
+                                        {
+                                            used_type = "charactère";
+                                            break
+                                        }
+                                        case "bool":
+                                        {
+                                            used_type = "booléen";
+                                            break
+                                        }
+                                    }
+                                    setError(Errors.wrongType("entier",used_type), datas.params[i].line, datas.params[i].col)
                                     return;
                                 }
 
@@ -382,13 +603,37 @@ export const callFunction = (datas, tree) =>
                             }
 
                             let index = stack[stack.length-2][datas.params[i].val].adr + getIndex(dim, indexes);
+                            if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2][datas.params[i].val].type == "float")
+                            {
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(memory[index].data);
+                            }
+                            else 
+                            {
+                                //OTHERS
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[index].data;
+                            }
                             stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = index;
                         }
                         else 
                         {
+                            
+                            if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2][datas.params[i].val].type == "float")
+                            {
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(memory[stack[stack.length-2][datas.params[i].val].adr].data);
+                            }
+                            else 
+                            {
+                                //OTHERS
+                                memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = memory[stack[stack.length-2][datas.params[i].val].adr].data;
+                            }
                             stack[stack.length-1][tree[pos].params[i].id]["$adr_out"] = stack[stack.length-2][datas.params[i].val].adr;
                         }
                     }
+                }
+                else 
+                {
+                    setError(Errors.outPutOnExpression("Entrée/Sortie"), datas.params[i].line, datas.params[i].col);
+                    return;
                 }
 
                 break;
@@ -396,8 +641,10 @@ export const callFunction = (datas, tree) =>
             case "ref":{
                 if(tree[pos].params[i].type != stack[stack.length-2][datas.params[i].val].type)
                 {
-                    //ERROR TYPE CONFLICT
-                    return;
+                    if(typeConflict(tree[pos].params[i].type, stack[stack.length-2][datas.params[i].val].type,datas.params[i]))
+                    {
+                        return;
+                    }
                 }
 
                 if(datas.params[i].val[0] != "$")
@@ -411,7 +658,26 @@ export const callFunction = (datas, tree) =>
                         {
                             if(registers[datas.params[i].index[j]].type != "int")
                             {
-                                //TYPE CONFLICT
+                                let used_type;
+                                switch(registers[datas.params[i].index[j]].type)
+                                {
+                                    case "float":
+                                    {
+                                        used_type = "réel";
+                                        break;
+                                    }
+                                    case "char":
+                                    {
+                                        used_type = "charactère";
+                                        break
+                                    }
+                                    case "bool":
+                                    {
+                                        used_type = "booléen";
+                                        break
+                                    }
+                                }
+                                setError(Errors.wrongType("entier",used_type), datas.params[i].line, datas.params[i].col)
                                 return;
                             }
 
@@ -430,6 +696,11 @@ export const callFunction = (datas, tree) =>
                         stack[stack.length-1][tree[pos].params[i].id].mode = "ref";
                     }
                 }
+                else 
+                {
+                    setError(Errors.outPutOnExpression("Référence"), datas.params[i].line, datas.params[i].col);
+                    return;
+                }
                 break;
             }
         }
@@ -440,17 +711,22 @@ export const returnFunction = (data) =>
 {
     if(typeof(getFct()["$type"]) == "undefined")
     {
-        //PROCEDURE AND RETURN WITH VALUE
+        setError(Errors.returnOnProcedure(), data.line, data.col);
         return;
     }
     
     if(getFct()["$type"] != registers[data.target].type)
     {
-        //TYPE CONFLICT
+        typeConflict(getFct()["$type"], registers[data.target.type, data]);
         return;
     }
 
     registers[getFct().$return_val] = {...registers[data.target]};
+
+    if(getFct()["$type"] == "int")
+    {
+        registers[getFct().$return_val].data = parseInt(registers[getFct().$return_val].data);
+    }
     endFunction();
 }
 
@@ -595,7 +871,6 @@ export const loadID = (data) =>
     }
     else 
     {
-        //registers[data.target] = memory[(stack[stack.length-1][data.val].index)]
         let indexes = [];
         let dim = [];
         
@@ -603,7 +878,7 @@ export const loadID = (data) =>
         {
             if(registers[data.index[i]].type != "int")
             {
-                //TYPE CONFLICT
+                wrongIndexType(registers[data.index[i]].type, data);
                 return;
             }
 
@@ -626,19 +901,34 @@ export const loadVal = (data) =>
 
 export const saveVal = (data) => 
 {
-    if(data.index.length == 0)
+    if(getFct()[data.target].is_const)
     {
-        if(memory[stack[stack.length-1][data.target].adr].type != registers[data.val].type)
+        setError(Errors.constAffectation(data.target), data.line, data.col);
+        return;
+    }
+
+    if(memory[stack[stack.length-1][data.target].adr].type != registers[data.val].type)
+    {
+        if(typeConflict(memory[stack[stack.length-1][data.target].adr].type, registers[data.val].type, data))
         {
-            //TYPE CONFLICT
             return;
         }
-        
-        memory[stack[stack.length-1][data.target].adr] = registers[data.val];
+    }
+
+    if(data.index.length == 0)
+    {
+        if(memory[stack[stack.length-1][data.target].adr].type == "int" && registers[data.val].type == "float")
+        {
+            memory[stack[stack.length-1][data.target].adr] = {...registers[data.val]};
+            memory[stack[stack.length-1][data.target].adr].data = parseInt(registers[data.val].data);
+        }
+        else 
+        {
+            memory[stack[stack.length-1][data.target].adr] = {...registers[data.val]};
+        }
     }
     else 
     {
-        //registers[data.target] = memory[(stack[stack.length-1][data.val].index)]
         let indexes = [];
         let dim = [];
         
@@ -646,7 +936,7 @@ export const saveVal = (data) =>
         {
             if(registers[data.index[i]].type != "int")
             {
-                //TYPE CONFLICT
+                wrongIndexType(registers[data.index[i]].type, data);
                 return;
             }
 
@@ -655,7 +945,17 @@ export const saveVal = (data) =>
         }
 
         let index = stack[stack.length-1][data.target].adr + getIndex(dim, indexes);
-        memory[index] = registers[data.val];
+        memory[index] = {...registers[data.val]};
+
+        if(memory[index].type == "int" && registers[data.val].type == "float")
+        {
+            memory[index] = {...registers[data.val]};
+            memory[index].data = parseInt(registers[data.val].data);
+        }
+        else 
+        {
+            memory[index] = {...registers[data.val]};
+        }
     }
 }
 
@@ -677,10 +977,16 @@ export const readVal = async (data) =>
                 const val = $(this).val();
                 $(this).prop("disabled", true);
                 current_input++;
-
+                
                 if(typeof(stack[stack.length-1][data.id]) == "undefined")
                 {
-                    //ID NOT EXISTANT
+                    setError(Errors.undeclaredVar(data.id),data.line, data.col);
+                    resolve("error");
+                }
+
+                if(getFct()[data.id].is_const)
+                {
+                    setError(Errors.constAffectation(data.id), data.line, data.col);
                     resolve("error");
                 }
 
@@ -697,20 +1003,45 @@ export const readVal = async (data) =>
                             {
                                 if(registers[data.index[i]].type != "int")
                                 {
-                                    //TYPE CONFLICT
-                                    return;
+                                    wrongIndexType(registers[data.index[i]].type, data);
+                                    resolve("error");
                                 }
 
                                 indexes.push(parseInt(registers[data.index[i]].data));
                                 dim.push(parseInt(stack[stack.length-1][data.id].dim[i].value));
                             }
+
                             let index = stack[stack.length-1][data.id].adr + getIndex(dim, indexes);
-                            memory[index].data = val;      
+                            if(memory[index].type != getType(val))
+                            {
+                                if(typeConflict(memory[index].type, getType(val), data))
+                                {
+                                    resolve("error");
+                                }
+                            }
+
+                            if(memory[index].type == "int" && getType(val))
+                            {
+                                memory[index].data = parseInt(val);  
+                            }    
+                            else 
+                            {
+                                //OTHERS
+                                memory[index].data = val;  
+                            }
                         }
                     }
                     else 
                     {
-                        memory[stack[stack.length-1][data.id].adr].data = val;
+                        if(memory[stack[stack.length-1][data.id].adr].type == "int" && getType(val))
+                        {
+                            memory[stack[stack.length-1][data.id].adr].data = parseInt(val);  
+                        }    
+                        else 
+                        {
+                            //OTHERS
+                            memory[stack[stack.length-1][data.id].adr].data = val;  
+                        }
                     }
                 }
                 resolve("done");
@@ -746,7 +1077,7 @@ const checkSizes = (data) =>
 {
     if(getFct()[data.id].dim.length != data.index.length)
     {
-        //ERR DIM MISMATCH
+        setError(Errors.dimMismatch(), data.line, data.col);
         return false;
     }
 
@@ -754,7 +1085,7 @@ const checkSizes = (data) =>
     {
         if(getFct()[data.id].dim[i] <= data.index[i])
         {
-            //ERR DIM MISMATCH
+            setError(Errors.dimMismatch(), data.line, data.col);
             return false;
         }
     }
@@ -816,8 +1147,10 @@ export const add = (data) =>
 {
     if(registers[data.val1].type != registers[data.val2].type)
     {
-        //TYPE CONFLICT
-        return;
+        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        {
+            return;
+        }
     }
 
     switch(registers[data.val1].type)
@@ -847,8 +1180,10 @@ export const sub = (data) =>
 {
     if(registers[data.val1].type != registers[data.val2].type)
     {
-        //TYPE CONFLICT
-        return;
+        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        {
+            return;
+        }
     }
 
     switch(registers[data.val1].type)
@@ -878,8 +1213,10 @@ export const mul = (data) =>
 {
     if(registers[data.val1].type != registers[data.val2].type)
     {
-        //TYPE CONFLICT
-        return;
+        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        {
+            return;
+        }
     }
 
     switch(registers[data.val1].type)
@@ -909,8 +1246,10 @@ export const div = (data) =>
 {
     if(registers[data.val1].type != registers[data.val2].type)
     {
-        //TYPE CONFLICT
-        return;
+        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        {
+            return;
+        }
     }
 
     switch(registers[data.val1].type)
@@ -919,7 +1258,7 @@ export const div = (data) =>
         {
             if(parseInt(registers[data.val2].data) == 0)
             {
-                //DIV BY 0
+                setError(Errors.divByZero(), data.line, data.col);
                 return;
             }
 
@@ -934,7 +1273,7 @@ export const div = (data) =>
         {
             if(parseFloat(registers[data.val2].data) == 0)
             {
-                //DIV BY 0
+                setError(Errors.divByZero(), data.line, data.col);
                 return;
             }
 
@@ -950,12 +1289,6 @@ export const div = (data) =>
 
 export const minus = (data) => 
 {
-    if(registers[data.val].type != "float" && registers[data.val].type != "int")
-    {
-        //TYPE CONFLICT
-        return;
-    }
-
     registers[data.target] = registers[data.val]
     registers[data.target].data = "-"+registers[data.val].data;
 }
@@ -1017,7 +1350,7 @@ export const eq = (data) =>
         {
             data: parseFloat(registers[data.val1].data) == parseFloat(registers[data.val2].data),
             type: "bool"
-        }; 
+        };
     }
 } 
 
@@ -1157,4 +1490,95 @@ export const repeatloop = (data) =>
         setNextInstruction(data.start);
         return;
     }
+}
+
+/* Errors */
+const setError = (message, line, col) =>
+{
+    error_list.push({
+        line: line,
+        col: col,
+        message: message
+    });
+
+    $("#exec .log").empty();
+    $("#exec").hide();
+    $("#build .log").empty();
+    for(let i = 0; i < error_list.length; i++)
+    {
+        $("#build .log").append("<div><span class='error'>ERREUR! ligne "+error_list[i].line+""+
+                            ", colonne "+ error_list[i].col + "</span>: "+ 
+                            error_list[i].message);
+    }
+    
+    $("#build").show();
+}
+
+const typeConflict = (t1,t2, data) => 
+{
+    if(t1 == "char")
+    {
+        if(t2 == "float")
+        {
+            setError(Errors.conflictingTypes("charactère", "réel"), data.line, data.col);
+            return true;
+        }
+        else if(t2 == "bool")
+        {
+            setError(Errors.conflictingTypes("charactère", "booléen"), data.line, data.col);
+            return true;
+        }
+    }
+    else if(t1 == "float")
+    {
+        if(t2 == "char")
+        {
+            setError(Errors.conflictingTypes("réel", "charactère"), data.line, data.col);
+            return true;
+        }
+        else if(t2 == "bool")
+        {
+            setError(Errors.conflictingTypes("réel", "booléen"), data.line, data.col);
+            return true;
+        }
+    }
+    else if(t1 == "bool")
+    {
+        if(t2 == "char")
+        {
+            setError(Errors.conflictingTypes("booléen", "charactère"), data.line, data.col);
+            return true;
+        }
+        else if(t2 == "float")
+        {
+            setError(Errors.conflictingTypes("booléen", "réel"), data.line, data.col);
+            return true;
+        }
+    }
+
+    return false;
+}
+
+const wrongIndexType = (t,data) =>
+{
+    let used_type;
+    switch(t)
+    {
+        case "float":
+        {
+            used_type = "réel";
+            break;
+        }
+        case "char":
+        {
+            used_type = "charactère";
+            break
+        }
+        case "bool":
+        {
+            used_type = "booléen";
+            break
+        }
+    }
+    setError(Errors.wrongType("entier",used_type), data.line, data.col)
 }

@@ -2,7 +2,6 @@ import * as Errors from '../errors/errors_semantic.js';
 
 let memory;
 let stack;
-let registers;
 
 let function_table;
 
@@ -17,8 +16,6 @@ export const init = (main_index) =>
 {
     memory = [];
     stack = [];
-
-    registers = {};
     current_input = 0;
 
     function_table = {};
@@ -144,6 +141,7 @@ export const mainStart = () =>
     stack.push(
     {
         id: "main",
+        $registers: {},
         next_instruction: next_instruction,
     });
 }
@@ -202,10 +200,12 @@ export const callFunction = (datas, tree) =>
     
     stack.push(
     {
+        $registers:{},
         id: datas.val,
         next_instruction: pos
     });
 
+    console.log(tree[pos])
     getFct()["$type"] = tree[pos].type;
     getFct()["$return_val"] = datas.target;
     for(let i = 0; i < datas.params.length; i++)
@@ -299,10 +299,10 @@ export const callFunction = (datas, tree) =>
                             
                             for(let j = 0; j < datas.params[i].index.length; j++)
                             {
-                                if(registers[datas.params[i].index[j]].type != "int")
+                                if(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type != "int")
                                 {
                                     let used_type;
-                                    switch(registers[datas.params[i].index[j]].type)
+                                    switch(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type )
                                     {
                                         case "float":
                                         {
@@ -324,7 +324,7 @@ export const callFunction = (datas, tree) =>
                                     return;
                                 }
 
-                                indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                                indexes.push(parseInt(stack[stack.length-2]["$registers"][datas.params[i].index[j]].data));
                                 dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
                             }
 
@@ -355,9 +355,9 @@ export const callFunction = (datas, tree) =>
                 }
                 else 
                 {
-                    if(tree[pos].params[i].type != registers[datas.params[i].val].type)
+                    if(tree[pos].params[i].type != stack[stack.length-2]["$registers"][datas.params[i].val].type)
                     {
-                        if(typeConflict(tree[pos].params[i].type, registers[datas.params[i].val].type,datas.params[i]))
+                        if(typeConflict(tree[pos].params[i].type, stack[stack.length-2]["$registers"][datas.params[i].val].type,datas.params[i]))
                         {
                             return;
                         }
@@ -369,22 +369,22 @@ export const callFunction = (datas, tree) =>
                         return;
                     }
 
-                    if(getFct()[tree[pos].params[i].id].type != registers[datas.params[i].val].type)
+                    if(getFct()[tree[pos].params[i].id].type != stack[stack.length-2]["$registers"][datas.params[i].val].type)
                     {
-                        if(typeConflict(getFct()[tree[pos].params[i].id].type, registers[datas.params[i].val].type, datas.params[i]))
+                        if(typeConflict(getFct()[tree[pos].params[i].id].type, stack[stack.length-2]["$registers"][datas.params[i].val].type, datas.params[i]))
                         {
                             return;
                         }
                     }
 
-                    if(getFct()[tree[pos].params[i].id].type == "int" && registers[datas.params[i].val].type == "float")
+                    if(getFct()[tree[pos].params[i].id].type == "int" && stack[stack.length-2]["$registers"][datas.params[i].val].type == "float")
                     {
-                        memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(registers[datas.params[i].val].data);
+                        memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(stack[stack.length-2]["$registers"][datas.params[i].val].data);
                     }
                     else 
                     {
                         //OTHERS
-                        memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(registers[datas.params[i].val].data);
+                        memory[stack[stack.length-1][tree[pos].params[i].id].adr].data = parseInt(stack[stack.length-2]["$registers"][datas.params[i].val].data);
                     }
                 }
                 break;
@@ -439,10 +439,10 @@ export const callFunction = (datas, tree) =>
                             
                             for(let j = 0; j < datas.params[i].index.length; j++)
                             {
-                                if(registers[datas.params[i].index[j]].type != "int")
+                                if(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type != "int")
                                 {
                                     let used_type;
-                                    switch(registers[datas.params[i].index[j]].type)
+                                    switch(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type )
                                     {
                                         case "float":
                                         {
@@ -464,7 +464,7 @@ export const callFunction = (datas, tree) =>
                                     return;
                                 }
 
-                                indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                                indexes.push(parseInt(stack[stack.length-2]["$registers"][datas.params[i].index[j]].data));
                                 dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
                             }
 
@@ -573,10 +573,10 @@ export const callFunction = (datas, tree) =>
                             
                             for(let j = 0; j < datas.params[i].index.length; j++)
                             {
-                                if(registers[datas.params[i].index[j]].type != "int")
+                                if(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type != "int")
                                 {
                                     let used_type;
-                                    switch(registers[datas.params[i].index[j]].type)
+                                    switch(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type )
                                     {
                                         case "float":
                                         {
@@ -598,7 +598,7 @@ export const callFunction = (datas, tree) =>
                                     return;
                                 }
 
-                                indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                                indexes.push(parseInt(stack[stack.length-2]["$registers"][datas.params[i].index[j]].data));
                                 dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
                             }
 
@@ -656,10 +656,10 @@ export const callFunction = (datas, tree) =>
                         
                         for(let j = 0; j < datas.params[i].index.length; j++)
                         {
-                            if(registers[datas.params[i].index[j]].type != "int")
+                            if(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type != "int")
                             {
                                 let used_type;
-                                switch(registers[datas.params[i].index[j]].type)
+                                switch(stack[stack.length-2]["$registers"][datas.params[i].index[j]].type )
                                 {
                                     case "float":
                                     {
@@ -681,7 +681,7 @@ export const callFunction = (datas, tree) =>
                                 return;
                             }
 
-                            indexes.push(parseInt(registers[datas.params[i].index[j]].data));
+                            indexes.push(parseInt(stack[stack.length-2]["$registers"][datas.params[i].index[j]].data));
                             dim.push(parseInt(stack[stack.length-2][datas.params[i].val].dim[j].value));
                         }
 
@@ -715,17 +715,17 @@ export const returnFunction = (data) =>
         return;
     }
     
-    if(getFct()["$type"] != registers[data.target].type)
+    if(getFct()["$type"] != getFct()["$registers"][data.target].type)
     {
-        typeConflict(getFct()["$type"], registers[data.target.type, data]);
+        typeConflict(getFct()["$type"], getFct()["$registers"][data.target.type, data]);
         return;
     }
 
-    registers[getFct().$return_val] = {...registers[data.target]};
+    stack[stack.length-2]["$registers"][getFct().$return_val] = {...getFct()["$registers"][data.target]};
 
     if(getFct()["$type"] == "int")
     {
-        registers[getFct().$return_val].data = parseInt(registers[getFct().$return_val].data);
+        stack[stack.length-2]["$registers"][getFct().$return_val].data = parseInt(stack[stack.length-2]["$registers"][getFct().$return_val].data);
     }
     endFunction();
 }
@@ -867,7 +867,7 @@ export const loadID = (data) =>
 {
     if(data.index.length == 0)
     {
-        registers[data.target] = memory[stack[stack.length-1][data.val].adr];
+        getFct()["$registers"][data.target] = memory[stack[stack.length-1][data.val].adr];
     }
     else 
     {
@@ -876,24 +876,24 @@ export const loadID = (data) =>
         
         for(let i = 0; i < data.index.length; i++)
         {
-            if(registers[data.index[i]].type != "int")
+            if(getFct()["$registers"][data.index[i]].type != "int")
             {
-                wrongIndexType(registers[data.index[i]].type, data);
+                wrongIndexType(getFct()["$registers"][data.index[i]].type, data);
                 return;
             }
 
-            indexes.push(parseInt(registers[data.index[i]].data));
+            indexes.push(parseInt(getFct()["$registers"][data.index[i]].data));
             dim.push(parseInt(stack[stack.length-1][data.val].dim[i].value));
         }
 
         let index = stack[stack.length-1][data.val].adr + getIndex(dim, indexes);
-        registers[data.target] = memory[index];
+        getFct()["$registers"][data.target] = memory[index];
     }
 }
 
 export const loadVal = (data) => 
 {
-    registers[data.target] = {
+    getFct()["$registers"][data.target] = {
         type: data.type,
         data: data.val
     }
@@ -907,9 +907,9 @@ export const saveVal = (data) =>
         return;
     }
 
-    if(memory[stack[stack.length-1][data.target].adr].type != registers[data.val].type)
+    if(memory[stack[stack.length-1][data.target].adr].type != getFct()["$registers"][data.val].type)
     {
-        if(typeConflict(memory[stack[stack.length-1][data.target].adr].type, registers[data.val].type, data))
+        if(typeConflict(memory[stack[stack.length-1][data.target].adr].type, getFct()["$registers"][data.val].type, data))
         {
             return;
         }
@@ -917,14 +917,14 @@ export const saveVal = (data) =>
 
     if(data.index.length == 0)
     {
-        if(memory[stack[stack.length-1][data.target].adr].type == "int" && registers[data.val].type == "float")
+        if(memory[stack[stack.length-1][data.target].adr].type == "int" && getFct()["$registers"][data.val].type == "float")
         {
-            memory[stack[stack.length-1][data.target].adr] = {...registers[data.val]};
-            memory[stack[stack.length-1][data.target].adr].data = parseInt(registers[data.val].data);
+            memory[stack[stack.length-1][data.target].adr] = {...getFct()["$registers"][data.val]};
+            memory[stack[stack.length-1][data.target].adr].data = parseInt(getFct()["$registers"][data.val].data);
         }
         else 
         {
-            memory[stack[stack.length-1][data.target].adr] = {...registers[data.val]};
+            memory[stack[stack.length-1][data.target].adr] = {...getFct()["$registers"][data.val]};
         }
     }
     else 
@@ -934,27 +934,27 @@ export const saveVal = (data) =>
         
         for(let i = 0; i < data.index.length; i++)
         {
-            if(registers[data.index[i]].type != "int")
+            if(getFct()["$registers"][data.index[i]].type != "int")
             {
-                wrongIndexType(registers[data.index[i]].type, data);
+                wrongIndexType(getFct()["$registers"][data.index[i]].type, data);
                 return;
             }
 
-            indexes.push(parseInt(registers[data.index[i]].data));
+            indexes.push(parseInt(getFct()["$registers"][data.index[i]].data));
             dim.push(parseInt(stack[stack.length-1][data.target].dim[i].value));
         }
 
         let index = stack[stack.length-1][data.target].adr + getIndex(dim, indexes);
-        memory[index] = {...registers[data.val]};
+        memory[index] = {...getFct()["$registers"][data.val]};
 
-        if(memory[index].type == "int" && registers[data.val].type == "float")
+        if(memory[index].type == "int" && getFct()["$registers"][data.val].type == "float")
         {
-            memory[index] = {...registers[data.val]};
-            memory[index].data = parseInt(registers[data.val].data);
+            memory[index] = {...getFct()["$registers"][data.val]};
+            memory[index].data = parseInt(getFct()["$registers"][data.val].data);
         }
         else 
         {
-            memory[index] = {...registers[data.val]};
+            memory[index] = {...getFct()["$registers"][data.val]};
         }
     }
 }
@@ -1001,13 +1001,13 @@ export const readVal = async (data) =>
                             
                             for(let i = 0; i < data.index.length; i++)
                             {
-                                if(registers[data.index[i]].type != "int")
+                                if(getFct()["$registers"][data.index[i]].type != "int")
                                 {
-                                    wrongIndexType(registers[data.index[i]].type, data);
+                                    wrongIndexType(getFct()["$registers"][data.index[i]].type, data);
                                     resolve("error");
                                 }
 
-                                indexes.push(parseInt(registers[data.index[i]].data));
+                                indexes.push(parseInt(getFct()["$registers"][data.index[i]].data));
                                 dim.push(parseInt(stack[stack.length-1][data.id].dim[i].value));
                             }
 
@@ -1057,7 +1057,7 @@ export const printStr = (data) =>
 
 export const printVal = (data) => 
 {
-    $("#exec .log").append(registers[data.val].data);
+    $("#exec .log").append(getFct()["$registers"][data.val].data);
 }
 
 export const printLineJump = () => 
@@ -1069,7 +1069,6 @@ export const LOG = () =>
 {
     console.log("Memory: ", memory);
     console.log("Stack: ", stack);
-    console.log("Registers: ", registers);
     console.log("Functions table: ", function_table);
 }
 
@@ -1145,31 +1144,31 @@ const getIndex = (dim, indexes) =>
 
 export const add = (data) =>
 {
-    if(registers[data.val1].type != registers[data.val2].type)
+    if(getFct()["$registers"][data.val1].type != getFct()["$registers"][data.val2].type)
     {
-        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        if(typeConflict(getFct()["$registers"][data.val1].type, getFct()["$registers"][data.val2].type, data))
         {
             return;
         }
     }
 
-    switch(registers[data.val1].type)
+    switch(getFct()["$registers"][data.val1].type)
     {
         case "int":
         {
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseInt(parseInt(registers[data.val1].data) + parseInt(registers[data.val2].data)),
-                type: registers[data.val1].type
+                data: ""+parseInt(parseInt(getFct()["$registers"][data.val1].data) + parseInt(getFct()["$registers"][data.val2].data)),
+                type: getFct()["$registers"][data.val1].type
             };   
             break;
         }
         case "float":
         {
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseFloat(parseFloat(registers[data.val1].data) + parseFloat(registers[data.val2].data)),
-                type: registers[data.val1].type
+                data: ""+parseFloat(parseFloat(getFct()["$registers"][data.val1].data) + parseFloat(getFct()["$registers"][data.val2].data)),
+                type: getFct()["$registers"][data.val1].type
             };
             break;
         } 
@@ -1178,31 +1177,31 @@ export const add = (data) =>
 
 export const sub = (data) =>
 {
-    if(registers[data.val1].type != registers[data.val2].type)
+    if(getFct()["$registers"][data.val1].type != getFct()["$registers"][data.val2].type)
     {
-        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        if(typeConflict(getFct()["$registers"][data.val1].type, getFct()["$registers"][data.val2].type, data))
         {
             return;
         }
     }
 
-    switch(registers[data.val1].type)
+    switch(getFct()["$registers"][data.val1].type)
     {
         case "int":
         {
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseInt(parseInt(registers[data.val1].data) - parseInt(registers[data.val2].data)),
-                type: registers[data.val1].type
+                data: ""+parseInt(parseInt(getFct()["$registers"][data.val1].data) - parseInt(getFct()["$registers"][data.val2].data)),
+                type: getFct()["$registers"][data.val1].type
             };   
             break;
         }
         case "float":
         {
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseFloat(parseFloat(registers[data.val1].data) - parseFloat(registers[data.val2].data)),
-                type: registers[data.val1].type
+                data: ""+parseFloat(parseFloat(getFct()["$registers"][data.val1].data) - parseFloat(getFct()["$registers"][data.val2].data)),
+                type: getFct()["$registers"][data.val1].type
             };
             break;
         } 
@@ -1211,31 +1210,31 @@ export const sub = (data) =>
 
 export const mul = (data) =>
 {
-    if(registers[data.val1].type != registers[data.val2].type)
+    if(getFct()["$registers"][data.val1].type != getFct()["$registers"][data.val2].type)
     {
-        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        if(typeConflict(getFct()["$registers"][data.val1].type, getFct()["$registers"][data.val2].type, data))
         {
             return;
         }
     }
 
-    switch(registers[data.val1].type)
+    switch(getFct()["$registers"][data.val1].type)
     {
         case "int":
         {
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseInt(parseInt(registers[data.val1].data) * parseInt(registers[data.val2].data)),
-                type: registers[data.val1].type
+                data: ""+parseInt(parseInt(getFct()["$registers"][data.val1].data) * parseInt(getFct()["$registers"][data.val2].data)),
+                type: getFct()["$registers"][data.val1].type
             };   
             break;
         }
         case "float":
         {
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseFloat(parseFloat(registers[data.val1].data) * parseFloat(registers[data.val2].data)),
-                type: registers[data.val1].type
+                data: ""+parseFloat(parseFloat(getFct()["$registers"][data.val1].data) * parseFloat(getFct()["$registers"][data.val2].data)),
+                type: getFct()["$registers"][data.val1].type
             };
             break;
         } 
@@ -1244,43 +1243,43 @@ export const mul = (data) =>
 
 export const div = (data) =>
 {
-    if(registers[data.val1].type != registers[data.val2].type)
+    if(getFct()["$registers"][data.val1].type != getFct()["$registers"][data.val2].type)
     {
-        if(typeConflict(registers[data.val1].type, registers[data.val2].type, data))
+        if(typeConflict(getFct()["$registers"][data.val1].type, getFct()["$registers"][data.val2].type, data))
         {
             return;
         }
     }
 
-    switch(registers[data.val1].type)
+    switch(getFct()["$registers"][data.val1].type)
     {
         case "int":
         {
-            if(parseInt(registers[data.val2].data) == 0)
+            if(parseInt(getFct()["$registers"][data.val2].data) == 0)
             {
                 setError(Errors.divByZero(), data.line, data.col);
                 return;
             }
 
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseInt((parseInt(registers[data.val1].data) / parseInt(registers[data.val2].data))),
-                type: registers[data.val1].type
+                data: ""+parseInt((parseInt(getFct()["$registers"][data.val1].data) / parseInt(getFct()["$registers"][data.val2].data))),
+                type: getFct()["$registers"][data.val1].type
             };   
             break;
         }
         case "float":
         {
-            if(parseFloat(registers[data.val2].data) == 0)
+            if(parseFloat(getFct()["$registers"][data.val2].data) == 0)
             {
                 setError(Errors.divByZero(), data.line, data.col);
                 return;
             }
 
-            registers[data.target] = 
+            getFct()["$registers"][data.target] = 
             {
-                data: ""+parseFloat((parseFloat(registers[data.val1].data) / parseFloat(registers[data.val2].data))),
-                type: registers[data.val1].type
+                data: ""+parseFloat((parseFloat(getFct()["$registers"][data.val1].data) / parseFloat(getFct()["$registers"][data.val2].data))),
+                type: getFct()["$registers"][data.val1].type
             };
             break;
         } 
@@ -1289,18 +1288,18 @@ export const div = (data) =>
 
 export const minus = (data) => 
 {
-    registers[data.target] = registers[data.val]
-    registers[data.target].data = "-"+registers[data.val].data;
+    getFct()["$registers"][data.target] = getFct()["$registers"][data.val]
+    getFct()["$registers"][data.target].data = "-"+getFct()["$registers"][data.val].data;
 }
 
 /* Boolean operation */
 export const sup = (data) => 
 {
-    if((registers[data.val1].type == "int" || registers[data.val1].type == "float") && (registers[data.val2].type == "int" || registers[data.val2].type == "float"))
+    if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
     {
-        registers[data.target] = 
+        getFct()["$registers"][data.target] = 
         {
-            data: parseFloat(registers[data.val1].data) > parseFloat(registers[data.val2].data),
+            data: parseFloat(getFct()["$registers"][data.val1].data) > parseFloat(getFct()["$registers"][data.val2].data),
             type: "bool"
         }; 
     }
@@ -1308,11 +1307,11 @@ export const sup = (data) =>
 
 export const supeq = (data) => 
 {
-    if((registers[data.val1].type == "int" || registers[data.val1].type == "float") && (registers[data.val2].type == "int" || registers[data.val2].type == "float"))
+    if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
     {
-        registers[data.target] = 
+        getFct()["$registers"][data.target] = 
         {
-            data: parseFloat(registers[data.val1].data) >= parseFloat(registers[data.val2].data),
+            data: parseFloat(getFct()["$registers"][data.val1].data) >= parseFloat(getFct()["$registers"][data.val2].data),
             type: "bool"
         }; 
     }
@@ -1320,11 +1319,11 @@ export const supeq = (data) =>
 
 export const lt = (data) => 
 {
-    if((registers[data.val1].type == "int" || registers[data.val1].type == "float") && (registers[data.val2].type == "int" || registers[data.val2].type == "float"))
+    if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
     {
-        registers[data.target] = 
+        getFct()["$registers"][data.target] = 
         {
-            data: parseFloat(registers[data.val1].data) < parseFloat(registers[data.val2].data),
+            data: parseFloat(getFct()["$registers"][data.val1].data) < parseFloat(getFct()["$registers"][data.val2].data),
             type: "bool"
         }; 
     }
@@ -1332,11 +1331,11 @@ export const lt = (data) =>
 
 export const leq = (data) => 
 {
-    if((registers[data.val1].type == "int" || registers[data.val1].type == "float") && (registers[data.val2].type == "int" || registers[data.val2].type == "float"))
+    if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
     {
-        registers[data.target] = 
+        getFct()["$registers"][data.target] = 
         {
-            data: parseFloat(registers[data.val1].data) <= parseFloat(registers[data.val2].data),
+            data: parseFloat(getFct()["$registers"][data.val1].data) <= parseFloat(getFct()["$registers"][data.val2].data),
             type: "bool"
         }; 
     }
@@ -1344,11 +1343,11 @@ export const leq = (data) =>
 
 export const eq = (data) => 
 {
-    if((registers[data.val1].type == "int" || registers[data.val1].type == "float") && (registers[data.val2].type == "int" || registers[data.val2].type == "float"))
+    if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
     {
-        registers[data.target] = 
+        getFct()["$registers"][data.target] = 
         {
-            data: parseFloat(registers[data.val1].data) == parseFloat(registers[data.val2].data),
+            data: parseFloat(getFct()["$registers"][data.val1].data) == parseFloat(getFct()["$registers"][data.val2].data),
             type: "bool"
         };
     }
@@ -1356,11 +1355,11 @@ export const eq = (data) =>
 
 export const dif = (data) => 
 {
-    if((registers[data.val1].type == "int" || registers[data.val1].type == "float") && (registers[data.val2].type == "int" || registers[data.val2].type == "float"))
+    if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
     {
-        registers[data.target] = 
+        getFct()["$registers"][data.target] = 
         {
-            data: parseFloat(registers[data.val1].data) != parseFloat(registers[data.val2].data),
+            data: parseFloat(getFct()["$registers"][data.val1].data) != parseFloat(getFct()["$registers"][data.val2].data),
             type: "bool"
         }; 
     }
@@ -1370,7 +1369,7 @@ export const dif = (data) =>
 
 export const condition = (data) => 
 {
-    if(!registers[data.eval].data)
+    if(!getFct()["$registers"][data.eval].data)
     {
         if(data.alt != null)
         {
@@ -1391,11 +1390,11 @@ export const forloop = (data) =>
     {
         case "int":
         {
-            if(parseInt(memory[stack[stack.length-1][data.startv].adr].data) > parseInt(registers[data.endv].data))
+            if(parseInt(memory[stack[stack.length-1][data.startv].adr].data) > parseInt(getFct()["$registers"][data.endv].data))
             {
                 return "desc";
             }
-            else if(parseInt(memory[stack[stack.length-1][data.startv].adr].data) < parseInt(registers[data.endv].data))
+            else if(parseInt(memory[stack[stack.length-1][data.startv].adr].data) < parseInt(getFct()["$registers"][data.endv].data))
             {
                 return "asc";
             }
@@ -1403,11 +1402,11 @@ export const forloop = (data) =>
         }
         case "float":
         {
-            if(parseFloat(memory[stack[stack.length-1][data.startv].adr].data) > parseFloat(registers[data.endv].data))
+            if(parseFloat(memory[stack[stack.length-1][data.startv].adr].data) > parseFloat(getFct()["$registers"][data.endv].data))
             {
                 return "desc";
             }
-            else if(parseFloat(memory[stack[stack.length-1][data.startv].adr].data) < parseFloat(registers[data.endv].data))
+            else if(parseFloat(memory[stack[stack.length-1][data.startv].adr].data) < parseFloat(getFct()["$registers"][data.endv].data))
             {
                 return "asc";
             }
@@ -1430,7 +1429,7 @@ export const step = (data) =>
             {
                 if(data.steptype == "desc")
                 {
-                    if(parseInt(memory[stack[stack.length-1][data.val].adr].data) <= parseInt(registers[data.endv].data))
+                    if(parseInt(memory[stack[stack.length-1][data.val].adr].data) <= parseInt(getFct()["$registers"][data.endv].data))
                     {
                         break;
                     }
@@ -1439,7 +1438,7 @@ export const step = (data) =>
                 }
                 else if(data.steptype == "asc")
                 {
-                    if(parseInt(memory[stack[stack.length-1][data.val].adr].data) >= parseInt(registers[data.endv].data))
+                    if(parseInt(memory[stack[stack.length-1][data.val].adr].data) >= parseInt(getFct()["$registers"][data.endv].data))
                     {
                         break;
                     }
@@ -1452,7 +1451,7 @@ export const step = (data) =>
             {
                 if(data.steptype == "desc")
                 {
-                    if(parseFloat(memory[stack[stack.length-1][data.val].adr].data) <= parseFloat(registers[data.endv].data))
+                    if(parseFloat(memory[stack[stack.length-1][data.val].adr].data) <= parseFloat(getFct()["$registers"][data.endv].data))
                     {
                         break;
                     }
@@ -1461,7 +1460,7 @@ export const step = (data) =>
                 }
                 else if(data.steptype == "asc")
                 {
-                    if(parseFloat(memory[stack[stack.length-1][data.val].adr].data) >= parseFloat(registers[data.endv].data))
+                    if(parseFloat(memory[stack[stack.length-1][data.val].adr].data) >= parseFloat(getFct()["$registers"][data.endv].data))
                     {
                         break;
                     }
@@ -1476,7 +1475,7 @@ export const step = (data) =>
 
 export const whileloop = (data) => 
 {
-    if(!registers[data.eval].data)
+    if(!getFct()["$registers"][data.eval].data)
     {
         setNextInstruction(data.end);
         return;
@@ -1485,7 +1484,7 @@ export const whileloop = (data) =>
 
 export const repeatloop = (data) => 
 {
-    if(!registers[data.eval].data)
+    if(!getFct()["$registers"][data.eval].data)
     {
         setNextInstruction(data.start);
         return;

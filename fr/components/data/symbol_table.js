@@ -784,7 +784,7 @@ export const endFunction = () =>
                             }
                             else 
                             {
-                                memory[getFct[key].$adr_out + j] = memory[getFct()[key].adr + j];
+                                memory[getFct()[key].$adr_out] = memory[getFct()[key].adr];
                                 memory[stack[stack.length-1][key].adr] = null;
                             }
                         }
@@ -810,7 +810,7 @@ export const endFunction = () =>
                             }
                             else 
                             {
-                                memory[getFct[key].$adr_out + j] = memory[getFct()[key].adr + j];
+                                memory[getFct()[key].$adr_out] = memory[getFct()[key].adr];
                                 memory[stack[stack.length-1][key].adr] = null;
                             }
                         }
@@ -1293,6 +1293,7 @@ export const minus = (data) =>
 }
 
 /* Boolean operation */
+
 export const sup = (data) => 
 {
     if((getFct()["$registers"][data.val1].type == "int" || getFct()["$registers"][data.val1].type == "float") && (getFct()["$registers"][data.val2].type == "int" || getFct()["$registers"][data.val2].type == "float"))
@@ -1366,6 +1367,7 @@ export const dif = (data) =>
 } 
 
 /* CONDITIONS */
+
 
 export const condition = (data) => 
 {
@@ -1492,6 +1494,8 @@ export const repeatloop = (data) =>
 }
 
 /* Errors */
+
+
 const setError = (message, line, col) =>
 {
     error_list.push({

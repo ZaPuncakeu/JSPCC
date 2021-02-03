@@ -1208,6 +1208,19 @@ const functor = () =>
                         });
                     }
                 }
+                else 
+                {
+                    expression();
+                    params.push(
+                    {
+                        instr: "set_param",
+                        val: program_tree[program_tree.length - 1].target,
+                        index: set_index(),
+                        fct: current_function,
+                        line: line,
+                        col: col
+                    });
+                }
 
                 if(checkToken(","))
                 {

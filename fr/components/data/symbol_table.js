@@ -1023,7 +1023,10 @@ export const readVal = async (data) =>
                             if(memory[index].type == "int" && getType(val))
                             {
                                 memory[index].data = parseInt(val);  
-                            }    
+                            }
+                            else if(memory[index].type == "float" && getType(val)){
+                                memory[index].data = parseFloat(val);  
+                            }
                             else 
                             {
                                 //OTHERS
@@ -1037,6 +1040,10 @@ export const readVal = async (data) =>
                         {
                             memory[stack[stack.length-1][data.id].adr].data = parseInt(val);  
                         }    
+                        else if(memory[stack[stack.length-1][data.id].adr].type == "float" && getType(val))
+                        {
+                            memory[stack[stack.length-1][data.id].adr].data = parseFloat(val);  
+                        } 
                         else 
                         {
                             //OTHERS
